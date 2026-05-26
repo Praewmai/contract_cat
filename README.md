@@ -5,7 +5,7 @@ This is a web application that extracts rate information, blackout dates, and mi
 ## Features
 - **Modern UI:** Clean, glassmorphism-based user interface.
 - **Auto-Save:** Form inputs automatically save to your browser's local storage.
-- **AI Extraction:** Uses the powerful Google Gemini 1.5 API to intelligently parse complex documents.
+- **AI Extraction:** Uses the powerful Google Gemini 2.0 API to intelligently parse complex documents.
 - **Excel Export:** Instant client-side Excel generation using SheetJS.
 
 ## Setup & Deployment (GitHub Pages)
