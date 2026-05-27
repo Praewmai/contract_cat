@@ -202,11 +202,11 @@ st.markdown("""
 # ─── Sidebar configuration ───
 with st.sidebar:
     st.markdown(
-        '<div class="sidebar-profile">\\n'
-        f'{mascot_img_html}\\n'
-        '<h2 class="sidebar-title">MeowAI 🐾</h2>\\n'
-        '<p class="sidebar-subtitle">Smart Extractor</p>\\n'
-        '</div>', 
+f"""<div class="sidebar-profile">
+{mascot_img_html}
+<h2 class="sidebar-title">MeowAI 🐾</h2>
+<p class="sidebar-subtitle">Smart Extractor</p>
+</div>""", 
         unsafe_allow_html=True
     )
     
