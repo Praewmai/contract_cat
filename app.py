@@ -23,7 +23,7 @@ def get_base64_image(file_path):
     return ""
 
 mascot_b64 = get_base64_image("mascot.png")
-mascot_img_html = f'<img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" />' if mascot_b64 else '<div class="mascot-avatar">🐾</div>'
+mascot_img_html = f'<img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" />' if mascot_b64 else '<div class="mascot-avatar" style="display:flex; align-items:center; justify-content:center; font-size:50px;">🐾</div>'
 
 # ─── Advanced Premium CSS ───
 st.markdown("""
@@ -46,6 +46,7 @@ st.markdown("""
     }
 
     /* Sidebar Styling */
+    [data-testid="collapsedControl"] { display: none !important; }
     [data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
         border-right: 1px solid #E9ECEF !important;
@@ -182,7 +183,7 @@ col_left, col_right = st.columns([1, 1.2], gap="large")
 
 with col_left:
     st.markdown("#### 📄 1. Upload Contract")
-    uploaded_file = st.file_uploader("Select PDF file", type=["pdf"], label_visibility="collapsed")
+    uploaded_file = st.file_uploader("Select Contract PDF (Required)", type=["pdf"])
     
     st.markdown("#### 📝 2. Contract Types")
     ct_main = st.checkbox("Main Contract (Base Rate)", value=True)
