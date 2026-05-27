@@ -13,20 +13,84 @@ st.set_page_config(
     layout="centered"
 )
 
-# Custom Styling for Dark UI
+# Custom Styling for Cat Theme UI
 st.markdown("""
 <style>
-    .main {
-        background-color: #0f172a;
+    /* Main Background - Soft grey/blue like the cat's fur */
+    .stApp {
+        background-color: #f4f6f9;
+        color: #334155;
     }
-    div[data-testid="stMarkdownContainer"] p {
-        font-family: 'Outfit', sans-serif;
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6, p, span, div, label {
+        font-family: 'Outfit', sans-serif !important;
+    }
+    
+    h1 {
+        color: #1e3a8a !important; /* Navy blue like the bowtie */
+        text-align: center;
+        font-weight: 800 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    h2, h3 {
+        color: #475569 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Buttons - Navy blue with yellow/gold accent on hover */
+    .stButton > button {
+        background-color: #1e3a8a;
+        color: #ffffff;
+        border-radius: 24px;
+        border: none;
+        padding: 10px 24px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(30, 58, 138, 0.25);
+    }
+    
+    .stButton > button:hover {
+        background-color: #fcd34d !important; /* Cute yellow star accent */
+        color: #1e3a8a !important;
+        border-color: #fcd34d !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(252, 211, 77, 0.4);
+    }
+
+    /* Inputs - Rounded and soft */
+    .stTextInput > div > div > input {
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        background-color: #ffffff;
+        color: #1e293b;
+        padding: 8px 16px;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #1e3a8a;
+        box-shadow: 0 0 0 1px #1e3a8a;
+    }
+    
+    /* File Uploader */
+    [data-testid="stFileUploader"] {
+        background-color: #ffffff;
+        border-radius: 16px;
+        padding: 16px;
+        border: 2px dashed #cbd5e1;
+        text-align: center;
+    }
+
+    /* Checkboxes and Radios */
+    .stCheckbox p, .stRadio p {
+        color: #334155 !important;
+        font-weight: 600 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("Contract PDF → Excel  🐾")
-st.image("cat_theme.jpg", use_column_width=True)
 st.write("Upload a contract PDF and let the AI Cat extract rates, dates, and terms into a dashboard-ready Excel file.")
 
 # 1. API Key
