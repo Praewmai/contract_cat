@@ -15,31 +15,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ─── Base64 Mascot ───
-# Load the user's uploaded cat_theme.jpg
-def get_base64_image(file_path):
-    if os.path.exists(file_path):
-        with open(file_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode('utf-8')
-    return ""
+# ─── Mascot Setup ───
+try:
+    from mascot_data import MASCOT_B64
+except ImportError:
+    MASCOT_B64 = ""
 
-mascot_b64 = get_base64_image("cat_theme.jpg")
-
-if mascot_b64:
-    # Use CSS crop to isolate the single chubby cat on the left
-    mascot_img_html = f'''
-    <div class="mascot-container">
-        <div class="mascot-crop">
-            <img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" />
-        </div>
-    </div>
-    '''
+if MASCOT_B64:
+    mascot_img_html = f'<div class="mascot-container"><div class="mascot-crop"><img src="data:image/png;base64,{MASCOT_B64}" class="mascot-avatar" /></div></div>'
 else:
-    mascot_img_html = '''
-    <div class="mascot-container">
-        <div class="mascot-crop" style="display:flex; align-items:center; justify-content:center; font-size:60px; background:#E2E8F0;">🐱</div>
-    </div>
-    '''
+    mascot_img_html = '<div class="mascot-container"><div class="mascot-crop" style="display:flex; align-items:center; justify-content:center; font-size:60px; background:#E2E8F0;">🐱</div></div>'
 
 # ─── Premium Grey Cat AI Theme CSS ───
 st.markdown("""
@@ -101,10 +86,7 @@ st.markdown("""
     .mascot-avatar {
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        /* Crop to isolate the left cat */
-        object-position: 15% 40%;
-        transform: scale(2.2);
+        object-fit: contain;
     }
     
     @keyframes float {
@@ -219,13 +201,14 @@ st.markdown("""
 
 # ─── Sidebar configuration ───
 with st.sidebar:
-    st.markdown(f"""
-    <div class="sidebar-profile">
-        {mascot_img_html}
-        <h2 class="sidebar-title">MeowAI 🐾</h2>
-        <p class="sidebar-subtitle">Smart Extractor</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="sidebar-profile">\\n'
+        f'{mascot_img_html}\\n'
+        '<h2 class="sidebar-title">MeowAI 🐾</h2>\\n'
+        '<p class="sidebar-subtitle">Smart Extractor</p>\\n'
+        '</div>', 
+        unsafe_allow_html=True
+    )
     
     st.markdown("### 🔑 API Access")
     api_key = st.text_input("Gemini API Key", type="password", placeholder="Paste your API key...")
