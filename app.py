@@ -9,141 +9,191 @@ import os
 
 # ─── Page Config ───
 st.set_page_config(
-    page_title="AI Cat Assistant 🐾 Contract PDF → Excel",
+    page_title="MeowAI 🐾 Contract Extractor",
     page_icon="🐾",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ─── Base64 Mascot ───
+# Load the user's uploaded cat_theme.jpg, fallback to mascot.png
 def get_base64_image(file_path):
     if os.path.exists(file_path):
         with open(file_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode('utf-8')
     return ""
 
-mascot_b64 = get_base64_image("mascot.png")
-mascot_img_html = f'<img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" />' if mascot_b64 else '<div class="mascot-avatar" style="display:flex; align-items:center; justify-content:center; font-size:50px;">🐾</div>'
+mascot_b64 = get_base64_image("cat_theme.jpg")
+if not mascot_b64:
+    mascot_b64 = get_base64_image("mascot.png")
 
-# ─── Advanced Premium CSS ───
+if mascot_b64:
+    mascot_img_html = f'<div class="mascot-container"><img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" /></div>'
+else:
+    mascot_img_html = '<div class="mascot-container"><div class="mascot-avatar" style="display:flex; align-items:center; justify-content:center; font-size:60px; background:#FFE4E1;">🐱</div></div>'
+
+# ─── Premium Cat AI Theme CSS ───
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* Global Streamlit overrides */
-    #MainMenu, footer {visibility: hidden !important;}
-    .block-container { padding: 2rem 3rem !important; }
-    
-    html, body, [class*="css"], .stMarkdown, p, span, label, h1, h2, h3, h4, h5, h6, div, input, button, textarea {
-        font-family: 'Prompt', sans-serif !important;
+    /* Safe font override that doesn't break Streamlit Material Icons */
+    html, body, .stApp, p, label, h1, h2, h3, h4, h5, h6, input, button, textarea, .stMarkdown {
+        font-family: 'Prompt', sans-serif;
     }
+    
+    /* Hide top bar and force sidebar to stay open */
+    #MainMenu, footer {visibility: hidden !important;}
+    header {background-color: transparent !important;}
+    [data-testid="collapsedControl"] { display: none !important; }
+    
+    .block-container { padding: 2rem 3rem !important; max-width: 1200px; }
 
-    /* Main background */
+    /* MeowAI Color Palette: Warm Cream, Soft Grey, Tuna Pink, Midnight Blue */
     .stApp {
-        background-color: #F8F9FA !important;
-        background-image: 
-            radial-gradient(circle at 10% 20%, rgba(74, 88, 153, 0.05) 0%, transparent 20%),
-            radial-gradient(circle at 90% 80%, rgba(74, 88, 153, 0.05) 0%, transparent 20%);
+        background-color: #FFFDF9 !important; /* Warm cream */
+        background-image: radial-gradient(#F5E6E8 1px, transparent 1px);
+        background-size: 20px 20px;
     }
 
     /* Sidebar Styling */
-    [data-testid="collapsedControl"] { display: none !important; }
     [data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
-        border-right: 1px solid #E9ECEF !important;
-        box-shadow: 4px 0 24px rgba(0,0,0,0.02) !important;
+        border-right: 2px dashed #FAD2E1 !important;
     }
     
     .sidebar-profile {
         text-align: center;
-        padding: 1rem 0 2rem 0;
-        border-bottom: 1px dashed #E9ECEF;
-        margin-bottom: 2rem;
+        padding: 1.5rem 0;
+        margin-bottom: 1rem;
+        background: linear-gradient(180deg, #FFF0F3 0%, #FFFFFF 100%);
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(255, 181, 167, 0.1);
     }
+    
+    .mascot-container {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 15px auto;
+    }
+    
     .mascot-avatar {
-        width: 120px;
-        height: 120px;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        background: #F8F9FA;
-        border: 4px solid #FFFFFF;
-        box-shadow: 0 8px 24px rgba(74, 88, 153, 0.15);
-        margin: 0 auto 1rem auto;
+        background: #FFFFFF;
+        border: 4px solid #FFB5A7;
+        box-shadow: 0 8px 25px rgba(255, 181, 167, 0.4);
         display: block;
-        animation: float 6s ease-in-out infinite;
+        animation: float 4s ease-in-out infinite;
     }
+    
     @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
-        100% { transform: translateY(0px); }
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-8px) rotate(2deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
     }
+
     .sidebar-title {
-        color: #2B3A67;
-        font-weight: 700;
-        font-size: 1.2rem;
+        color: #5D576B;
+        font-weight: 800;
+        font-size: 1.5rem;
         margin: 0;
+        letter-spacing: -0.5px;
     }
     .sidebar-subtitle {
-        color: #6C757D;
+        color: #FF9F1C;
         font-size: 0.9rem;
-        font-weight: 400;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
-    /* Chat Bubble */
+    /* Chat Bubble / Hero Section */
     .chat-bubble {
         background: #FFFFFF;
-        border-radius: 20px;
-        padding: 1.5rem 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        border-radius: 24px;
+        border-bottom-left-radius: 4px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(93, 87, 107, 0.08);
         position: relative;
-        margin-bottom: 2rem;
-        border-left: 6px solid #4A5899;
+        margin-bottom: 2.5rem;
+        border: 2px solid #FAD2E1;
         display: flex;
         align-items: center;
-        gap: 1.5rem;
+        gap: 2rem;
+    }
+    .chat-bubble::before {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: -20px;
+        border-width: 20px 20px 0 0;
+        border-style: solid;
+        border-color: #FAD2E1 transparent transparent transparent;
+    }
+    .chat-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: 0px;
+        left: -16px;
+        border-width: 17px 17px 0 0;
+        border-style: solid;
+        border-color: #FFFFFF transparent transparent transparent;
     }
     .chat-bubble h3 {
-        color: #2B3A67 !important;
+        color: #FF707A !important;
         margin: 0 0 0.5rem 0 !important;
-        font-size: 1.4rem !important;
+        font-size: 1.6rem !important;
+        font-weight: 700 !important;
     }
     .chat-bubble p {
-        color: #495057 !important;
+        color: #5D576B !important;
         margin: 0 !important;
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
     }
-
     
     /* Inputs */
     .stTextInput > div > div > input {
-        border-radius: 10px !important;
-        border: 1px solid #DEE2E6 !important;
-        padding: 0.6rem 1rem !important;
-        background-color: #F8F9FA !important;
-        color: #495057 !important;
-        transition: all 0.2s;
+        border-radius: 12px !important;
+        border: 2px solid #F1E3E4 !important;
+        padding: 0.7rem 1.2rem !important;
+        background-color: #FFFFFF !important;
+        color: #5D576B !important;
+        font-weight: 500;
+        transition: all 0.3s;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #4A5899 !important;
-        background-color: #FFFFFF !important;
-        box-shadow: 0 0 0 3px rgba(74,88,153,0.1) !important;
+        border-color: #FFB5A7 !important;
+        box-shadow: 0 0 0 4px rgba(255, 181, 167, 0.15) !important;
     }
 
     /* Primary Button */
     div[data-testid="stButton"] > button {
-        background: linear-gradient(135deg, #4A5899 0%, #3B477A 100%) !important;
+        background: linear-gradient(135deg, #FF707A 0%, #FF9F1C 100%) !important;
         color: #FFFFFF !important;
         border: none !important;
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         padding: 0.8rem 2rem !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
         width: 100%;
-        box-shadow: 0 4px 12px rgba(74,88,153,0.2) !important;
-        transition: all 0.3s !important;
+        box-shadow: 0 6px 20px rgba(255, 112, 122, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     div[data-testid="stButton"] > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 16px rgba(74,88,153,0.3) !important;
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0 10px 25px rgba(255, 112, 122, 0.4) !important;
     }
+    
+    /* Checkbox */
+    [data-testid="stCheckbox"] label span {
+        color: #5D576B !important;
+        font-weight: 500 !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -153,12 +203,12 @@ with st.sidebar:
     st.markdown(f"""
     <div class="sidebar-profile">
         {mascot_img_html}
-        <h2 class="sidebar-title">AI Cat Assistant</h2>
-        <p class="sidebar-subtitle">Contract PDF Extractor</p>
+        <h2 class="sidebar-title">MeowAI 🐾</h2>
+        <p class="sidebar-subtitle">Smart Extractor</p>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### ⚙️ System Config")
+    st.markdown("### 🔑 API Access")
     api_key = st.text_input("Gemini API Key", type="password", placeholder="Paste your API key...")
     
     st.markdown("---")
@@ -171,10 +221,10 @@ with st.sidebar:
 # ─── Main Content ───
 st.markdown("""
 <div class="chat-bubble">
-    <div style="font-size: 3rem;">👋</div>
+    <div style="font-size: 3.5rem; animation: float 3s ease-in-out infinite;">😸</div>
     <div>
-        <h3>สวัสดีชาว Hotelier! เมี๊ยว~</h3>
-        <p>อัพโหลดไฟล์ PDF Contract สัญญาโรงแรมด้านล่างนี้เลย เดี๋ยวหนูจะช่วยสกัดข้อมูล Rate, Date, Terms ทั้งหมดให้ออกมาเป็น Excel สวยๆ พร้อมเอาไปใช้งานต่อทันทีค่ะ!</p>
+        <h3>เมี้ยวว~ สวัสดีชาว Hotelier!</h3>
+        <p>หนู MeowAI พร้อมทำงานแล้วค่ะ! แค่โยนไฟล์ PDF สัญญาโรงแรมมาให้หนูเดี๋ยวหนูจะใช้พลังเหมียวสกัดข้อมูล Rate, Date, Terms ทั้งหมดให้ออกมาเป็น Excel สวยๆ พร้อมนำไปใช้งานต่อได้เลย!</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -182,10 +232,10 @@ st.markdown("""
 col_left, col_right = st.columns([1, 1.2], gap="large")
 
 with col_left:
-    st.markdown("#### 📄 1. Upload Contract")
-    uploaded_file = st.file_uploader("Select Contract PDF (Required)", type=["pdf"])
+    st.markdown("#### 📄 1. โยนไฟล์สัญญามาเลย! (PDF)")
+    uploaded_file = st.file_uploader("Select Contract PDF", type=["pdf"])
     
-    st.markdown("#### 📝 2. Contract Types")
+    st.markdown("#### 🐟 2. ประเภทของสัญญา (Contract Types)")
     ct_main = st.checkbox("Main Contract (Base Rate)", value=True)
     
     col_eb1, col_eb2 = st.columns([1, 1])
@@ -205,7 +255,7 @@ with col_left:
     ct_por = st.checkbox("POR (Price on Request)", value=True)
 
 with col_right:
-    st.markdown("#### 🚪 3. Rooms Configuration")
+    st.markdown("#### 🚪 3. ตั้งค่าห้องพัก (Rooms Config)")
     
     if 'rooms' not in st.session_state:
         st.session_state.rooms = [{"room_name": "", "room_id": ""}]
@@ -224,11 +274,11 @@ with col_right:
         with rc2:
             room["room_id"] = st.text_input(f"ID {idx}", value=room["room_id"], key=f"ri_{idx}", placeholder="101", label_visibility="collapsed")
         with rc3:
-            if st.button("🗑️", key=f"del_{idx}", help="Remove Room"):
+            if st.button("🗑️", key=f"del_{idx}", help="ลบห้องนี้"):
                 remove_room(idx)
                 st.rerun()
                 
-    st.button("＋ Add Room", on_click=add_room, use_container_width=True)
+    st.button("🐾 เพิ่มห้องพัก (Add Room)", on_click=add_room, use_container_width=True)
 
 
 # ─── Data Extraction Logic ───
@@ -242,17 +292,17 @@ if ct_eb: cts.append({"type": "eb", "label": "Early Bird", "code": eb_code})
 if ct_promo: cts.append({"type": "promo", "label": "Promotion", "promo_code": promo_code, "promo_till": promo_till})
 if ct_por: cts.append({"type": "por", "label": "POR"})
 
-if st.button("🚀 Process Contract & Generate Excel", use_container_width=True):
+if st.button("🚀 สั่งเหมียวทำงาน! (Process Contract)", use_container_width=True):
     if not api_key:
-        st.error("⚠️ Please enter your Gemini API Key in the sidebar.")
+        st.error("⚠️ เมี้ยว! อย่าลืมใส่ Gemini API Key ที่แถบด้านซ้ายนะเหมียว")
     elif not uploaded_file:
-        st.error("⚠️ Please upload a PDF file.")
+        st.error("⚠️ เมี้ยว! ขาดไฟล์ PDF นะเหมียว อัพโหลดให้หน่อย")
     elif not hotel_id:
-        st.error("⚠️ Please enter a Property ID in the sidebar.")
+        st.error("⚠️ เมี้ยว! ใส่ Property ID ให้ครบด้วยนะ")
     elif not valid_rooms:
-        st.error("⚠️ Please add at least one Room Name & Room ID pair.")
+        st.error("⚠️ เมี้ยว! ต้องมีห้องพักอย่างน้อย 1 ห้องนะ")
     elif not cts:
-        st.error("⚠️ Please select at least one contract type.")
+        st.error("⚠️ เมี้ยว! เลือกประเภทสัญญาให้หน่อยสิ")
     else:
         with st.spinner("🐱 น้องแมวกำลังอ่าน contract อยู่นะ… รอสักครู่ (ไม่เกิน 60 วินาที)"):
             try:
@@ -353,7 +403,7 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                 wb.save(buf)
                 buf.seek(0)
 
-                st.success(f"✅ สำเร็จ! ดึงข้อมูลได้ **{len(rows)}** แถวจาก contract")
+                st.success(f"✅ สำเร็จ! เหมียวดึงข้อมูลได้ **{len(rows)}** แถวจาก contract")
                 st.balloons()
                 st.download_button(
                     label="📥  Download Excel (.xlsx)",
