@@ -5,6 +5,7 @@ import requests
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 import io
+import datetime
 
 # Page Config
 st.set_page_config(
@@ -28,12 +29,12 @@ st.markdown("""
                     #0f172a !important;
         color: #f8fafc;
     }
-    
+
     /* Typography */
     h1, h2, h3, h4, h5, h6, p, span, div, label {
         font-family: 'Outfit', sans-serif !important;
     }
-    
+
     h1 {
         background: linear-gradient(135deg, #818cf8 0%, #e0e7ff 100%);
         -webkit-background-clip: text;
@@ -44,7 +45,7 @@ st.markdown("""
         margin-bottom: 2rem !important;
         text-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
     }
-    
+
     h2, h3 {
         color: #e2e8f0 !important;
         font-weight: 700 !important;
@@ -53,14 +54,15 @@ st.markdown("""
         margin-top: 2rem !important;
     }
 
-    /* Glassmorphism Containers - Target main blocks */
-    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
+    /* Glassmorphism Containers - .card */
+    .card {
         background: rgba(30, 41, 59, 0.6) !important;
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 24px !important;
         padding: 32px !important;
+        margin: 1rem 0 !important;
         box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3) !important;
     }
 
@@ -74,13 +76,12 @@ st.markdown("""
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
-    
     .stTextInput > div > div > input:focus {
         border-color: #818cf8 !important;
         box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
         background-color: rgba(15, 23, 42, 0.9) !important;
     }
-    
+
     /* Premium File Uploader */
     [data-testid="stFileUploader"] {
         background-color: rgba(30, 41, 59, 0.4) !important;
@@ -109,13 +110,11 @@ st.markdown("""
         box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5) !important;
         width: 100%;
     }
-    
     .stButton > button:hover {
         transform: translateY(-3px) !important;
         box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.6) !important;
         background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%) !important;
     }
-    
     .stButton > button:active {
         transform: translateY(0) !important;
         box-shadow: 0 5px 10px -5px rgba(99, 102, 241, 0.5) !important;
@@ -126,18 +125,14 @@ st.markdown("""
         color: #cbd5e1 !important;
         font-weight: 500 !important;
     }
-    
-    /* Remove weird backgrounds from Streamlit's default radio/checkbox wrappers */
     div[data-baseweb="radio"] > div, div[data-baseweb="checkbox"] > div {
         background-color: transparent !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="card">', unsafe_allow_html=True)
 st.title("Contract PDF → Excel  🐾")
 st.write("Upload a contract PDF and let the AI Cat extract rates, dates, and terms into a dashboard-ready Excel file.")
-st.markdown('</div>', unsafe_allow_html=True)
 
 # 1. API Key
 st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -146,15 +141,15 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # 2. PDF Upload
 st.markdown('<div class="card">', unsafe_allow_html=True)
-uploaded_file = st.file_uploader("📄 Upload Contract PDF", type=["pdf"]) 
+uploaded_file = st.file_uploader("📄 Upload Contract PDF", type=["pdf"])
 st.markdown('</div>', unsafe_allow_html=True)
 
 # 3. Property Type
 st.markdown('<div class="card">', unsafe_allow_html=True)
-prop_type = st.radio("🏢 Property Type", ["Hotel / Resort", "Cruise Ship"]) 
+prop_type = st.radio("🏢 Property Type", ["Hotel / Resort", "Cruise Ship"])
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 4. Info Grid
+# 4. Info Grid (Hotel ID & Supplier)
 st.markdown('<div class="card">', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
@@ -175,6 +170,7 @@ def add_room_callback():
 def remove_room_callback(index):
     if len(st.session_state.rooms) > 1:
         st.session_state.rooms.pop(index)
+
 for idx in range(len(st.session_state.rooms)):
     if idx >= len(st.session_state.rooms):
         break
@@ -196,14 +192,10 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="card">', unsafe_allow_html=True)
 st.subheader("📝 Contract Types to Generate")
 ct_main = st.checkbox("Main Contract (Base Rate)", value=True)
-
-# Early bird options
 ct_eb = st.checkbox("Early Bird (Advance Booking)", value=False)
 eb_code = "E.B DAYS"
 if ct_eb:
     eb_code = st.text_input("Early Bird Promo Prefix (e.g. E.B DAYS)", value="E.B DAYS")
-
-# Promo options
 ct_promo = st.checkbox("Promotion (Special Offer)", value=False)
 promo_code = ""
 promo_till = ""
@@ -213,10 +205,7 @@ if ct_promo:
         promo_code = st.text_input("Promo Code (e.g. FLASH2026)")
     with p_col2:
         promo_till = st.text_input("Book Till Date (e.g. YYYY-MM-DD)")
-
 ct_por = st.checkbox("POR (Price on Request)", value=True)
-
-# Compile selected contract list
 cts = []
 if ct_main:
     cts.append({"type": "main", "label": "Main Contract"})
@@ -246,12 +235,9 @@ if st.button("Let the AI Cat Extract Data! 🐾", use_container_width=True):
     else:
         with st.spinner("AI is reading the contract and extracting rate entries... (may take up to 60s)"):
             try:
-                # Read file bytes and encode to base64
                 file_bytes = uploaded_file.read()
                 b64_data = base64.b64encode(file_bytes).decode("utf-8")
-                
                 room_hint = f"Use exactly these rooms (match strictly by room_name to get room_id): {json.dumps(valid_rooms)}"
-                
                 ct_desc_parts = []
                 for c in cts:
                     if c["type"] == "main":
@@ -263,7 +249,6 @@ if st.button("Let the AI Cat Extract Data! 🐾", use_container_width=True):
                     elif c["type"] == "por":
                         ct_desc_parts.append("POR: net_price=0, promo_code=\"POR Rate\".")
                 ct_desc = " | ".join(ct_desc_parts)
-                
                 prompt_text = f"""You are a data extraction expert. Analyze the hotel contract PDF and extract rates into an Excel-ready flat array.
 Rules:
 1. Surcharges/Min Nights/Blackout dates: auto-detect and apply to the appropriate date ranges. Split periods if necessary.
@@ -297,7 +282,6 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
     }}
   ]
 }}"""
-
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
                 payload = {
                     "contents": [{
@@ -313,28 +297,23 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                     }
                 }
                 headers = {"Content-Type": "application/json"}
-                
                 resp = requests.post(url, json=payload, headers=headers, timeout=120)
                 data = resp.json()
                 if resp.status_code != 200:
                     raise Exception(data.get("error", {}).get("message", "Gemini API Error"))
-                    
                 text_output = data["candidates"][0]["content"]["parts"][0]["text"]
                 result_json = json.loads(text_output)
                 rows = result_json.get("all_rows", [])
-                
-                # Structuring the Excel workbook in memory
+                # Create Excel workbook
                 wb = Workbook()
                 ws = wb.active
                 ws.title = "Extracted Rates"
-                
                 headers_excel = [
-                    "Hotel Name", "Hotel ID", "Supplier", "Room ID", "Room Name", 
-                    "Start Date", "End Date", "Contract Type", "Net Price", 
+                    "Hotel Name", "Hotel ID", "Supplier", "Room ID", "Room Name",
+                    "Start Date", "End Date", "Contract Type", "Net Price",
                     "Promo Code", "Book Till", "Min Advance Days", "Min Nights", "Notes"
                 ]
                 ws.append(headers_excel)
-                
                 for r in rows:
                     ws.append([
                         r.get("hotel_name", ""),
@@ -352,7 +331,7 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                         r.get("min_nights_stay", 0),
                         r.get("promo_note", "")
                     ])
-                    
+                # Auto‑size columns
                 for col in ws.columns:
                     max_len = 0
                     for cell in col:
@@ -361,13 +340,10 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                             max_len = len(val_str)
                     col_letter = get_column_letter(col[0].column)
                     ws.column_dimensions[col_letter].width = max(max_len + 3, 10)
-                
                 excel_data = io.BytesIO()
                 wb.save(excel_data)
                 excel_data.seek(0)
-                
                 st.success(f"Success! Extracted {len(rows)} rows.")
-                
                 st.download_button(
                     label="📥 Download Excel (.xlsx)",
                     data=excel_data,
@@ -375,7 +351,6 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True
                 )
-                
             except Exception as e:
                 st.error(f"Analysis failed: {str(e)}")
 st.markdown('</div>', unsafe_allow_html=True)
