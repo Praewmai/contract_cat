@@ -30,7 +30,7 @@ st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
     /* Global Streamlit overrides */
-    #MainMenu, footer, header {visibility: hidden !important;}
+    #MainMenu, footer {visibility: hidden !important;}
     .block-container { padding: 2rem 3rem !important; }
     
     html, body, [class*="css"], .stMarkdown, p, span, label, h1, h2, h3, h4, h5, h6, div, input, button, textarea {
@@ -111,15 +111,6 @@ st.markdown("""
         font-size: 1rem !important;
     }
 
-    /* Cards */
-    .dashboard-card {
-        background: #FFFFFF;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        border: 1px solid #F1F3F5;
-        height: 100%;
-    }
     
     /* Inputs */
     .stTextInput > div > div > input {
@@ -134,19 +125,6 @@ st.markdown("""
         border-color: #4A5899 !important;
         background-color: #FFFFFF !important;
         box-shadow: 0 0 0 3px rgba(74,88,153,0.1) !important;
-    }
-
-    /* Uploader */
-    [data-testid="stFileUploaderDropzone"] {
-        background-color: #F8F9FA !important;
-        border: 2px dashed #CED4DA !important;
-        border-radius: 16px !important;
-        padding: 2rem !important;
-        transition: all 0.3s;
-    }
-    [data-testid="stFileUploaderDropzone"]:hover {
-        border-color: #4A5899 !important;
-        background-color: #F4F6FB !important;
     }
 
     /* Primary Button */
@@ -203,7 +181,6 @@ st.markdown("""
 col_left, col_right = st.columns([1, 1.2], gap="large")
 
 with col_left:
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
     st.markdown("#### 📄 1. Upload Contract")
     uploaded_file = st.file_uploader("Select PDF file", type=["pdf"], label_visibility="collapsed")
     
@@ -225,10 +202,8 @@ with col_left:
         promo_till = st.text_input("Till", placeholder="YYYY-MM-DD", disabled=not ct_promo, label_visibility="collapsed")
         
     ct_por = st.checkbox("POR (Price on Request)", value=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 with col_right:
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
     st.markdown("#### 🚪 3. Rooms Configuration")
     
     if 'rooms' not in st.session_state:
@@ -253,7 +228,6 @@ with col_right:
                 st.rerun()
                 
     st.button("＋ Add Room", on_click=add_room, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ─── Data Extraction Logic ───
