@@ -59,15 +59,12 @@ st.markdown("""
         text-align: center;
         padding: 1.5rem 0;
         margin-bottom: 1rem;
-        background: linear-gradient(180deg, #F1F5F9 0%, #FFFFFF 100%);
-        border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(100, 116, 139, 0.08);
     }
     
     .mascot-container {
         position: relative;
-        width: 140px;
-        height: 140px;
+        width: 160px;
+        height: 160px;
         margin: 0 auto 15px auto;
         animation: float 5s ease-in-out infinite;
     }
@@ -75,11 +72,7 @@ st.markdown("""
     .mascot-crop {
         width: 100%;
         height: 100%;
-        border-radius: 50%;
         overflow: hidden;
-        border: 4px solid #CBD5E1;
-        box-shadow: 0 8px 25px rgba(100, 116, 139, 0.25);
-        background: #FFFFFF;
         position: relative;
     }
     
@@ -87,6 +80,7 @@ st.markdown("""
         width: 100%;
         height: 100%;
         object-fit: contain;
+        mix-blend-mode: multiply;
     }
     
     @keyframes float {
