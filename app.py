@@ -13,13 +13,20 @@ st.set_page_config(
     layout="centered"
 )
 
-# Custom Styling for Cat Theme UI
+# Custom Styling for Premium UI
 st.markdown("""
 <style>
-    /* Main Background - Soft grey/blue like the cat's fur */
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+
+    /* Premium Dark Mesh Gradient Background */
     .stApp {
-        background-color: #f4f6f9;
-        color: #334155;
+        background: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                    #0f172a !important;
+        color: #f8fafc;
     }
     
     /* Typography */
@@ -28,64 +35,101 @@ st.markdown("""
     }
     
     h1 {
-        color: #1e3a8a !important; /* Navy blue like the bowtie */
+        background: linear-gradient(135deg, #818cf8 0%, #e0e7ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         text-align: center;
         font-weight: 800 !important;
-        margin-bottom: 0.5rem !important;
+        letter-spacing: -1px;
+        margin-bottom: 2rem !important;
+        text-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
     }
     
     h2, h3 {
-        color: #475569 !important;
+        color: #e2e8f0 !important;
         font-weight: 700 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 10px;
+        margin-top: 2rem !important;
     }
 
-    /* Buttons - Navy blue with yellow/gold accent on hover */
-    .stButton > button {
-        background-color: #1e3a8a;
-        color: #ffffff;
-        border-radius: 24px;
-        border: none;
-        padding: 10px 24px;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(30, 58, 138, 0.25);
-    }
-    
-    .stButton > button:hover {
-        background-color: #fcd34d !important; /* Cute yellow star accent */
-        color: #1e3a8a !important;
-        border-color: #fcd34d !important;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(252, 211, 77, 0.4);
+    /* Glassmorphism Containers - Target main blocks */
+    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
+        background: rgba(30, 41, 59, 0.6) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 24px !important;
+        padding: 32px !important;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3) !important;
     }
 
-    /* Inputs - Rounded and soft */
+    /* Inputs - Glassmorphism & Neumorphism blend */
     .stTextInput > div > div > input {
-        border-radius: 12px;
-        border: 2px solid #e2e8f0;
-        background-color: #ffffff;
-        color: #1e293b;
-        padding: 8px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        color: #f8fafc !important;
+        padding: 12px 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
     
     .stTextInput > div > div > input:focus {
-        border-color: #1e3a8a;
-        box-shadow: 0 0 0 1px #1e3a8a;
+        border-color: #818cf8 !important;
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
+        background-color: rgba(15, 23, 42, 0.9) !important;
     }
     
-    /* File Uploader */
+    /* Premium File Uploader */
     [data-testid="stFileUploader"] {
-        background-color: #ffffff;
-        border-radius: 16px;
-        padding: 16px;
-        border: 2px dashed #cbd5e1;
+        background-color: rgba(30, 41, 59, 0.4) !important;
+        border-radius: 20px !important;
+        padding: 24px !important;
+        border: 2px dashed rgba(129, 140, 248, 0.3) !important;
         text-align: center;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stFileUploader"]:hover {
+        border-color: #818cf8 !important;
+        background-color: rgba(30, 41, 59, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
-    /* Checkboxes and Radios */
+    /* Buttons - Glowing Gradient */
+    .stButton > button {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+        color: #ffffff !important;
+        border-radius: 100px !important;
+        border: none !important;
+        padding: 12px 32px !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5) !important;
+        width: 100%;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.6) !important;
+        background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%) !important;
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0) !important;
+        box-shadow: 0 5px 10px -5px rgba(99, 102, 241, 0.5) !important;
+    }
+
+    /* Custom Checkboxes and Radios */
     .stCheckbox p, .stRadio p {
-        color: #334155 !important;
-        font-weight: 600 !important;
+        color: #cbd5e1 !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Remove weird backgrounds from Streamlit's default radio/checkbox wrappers */
+    div[data-baseweb="radio"] > div, div[data-baseweb="checkbox"] > div {
+        background-color: transparent !important;
     }
 </style>
 """, unsafe_allow_html=True)
