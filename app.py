@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # ─── Base64 Mascot ───
-# Load the user's uploaded cat_theme.jpg, fallback to mascot.png
+# Load the user's uploaded cat_theme.jpg
 def get_base64_image(file_path):
     if os.path.exists(file_path):
         with open(file_path, "rb") as img_file:
@@ -24,15 +24,24 @@ def get_base64_image(file_path):
     return ""
 
 mascot_b64 = get_base64_image("cat_theme.jpg")
-if not mascot_b64:
-    mascot_b64 = get_base64_image("mascot.png")
 
 if mascot_b64:
-    mascot_img_html = f'<div class="mascot-container"><img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" /></div>'
+    # Use CSS crop to isolate the single chubby cat on the left
+    mascot_img_html = f'''
+    <div class="mascot-container">
+        <div class="mascot-crop">
+            <img src="data:image/png;base64,{mascot_b64}" class="mascot-avatar" />
+        </div>
+    </div>
+    '''
 else:
-    mascot_img_html = '<div class="mascot-container"><div class="mascot-avatar" style="display:flex; align-items:center; justify-content:center; font-size:60px; background:#FFE4E1;">🐱</div></div>'
+    mascot_img_html = '''
+    <div class="mascot-container">
+        <div class="mascot-crop" style="display:flex; align-items:center; justify-content:center; font-size:60px; background:#E2E8F0;">🐱</div>
+    </div>
+    '''
 
-# ─── Premium Cat AI Theme CSS ───
+# ─── Premium Grey Cat AI Theme CSS ───
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -48,26 +57,26 @@ st.markdown("""
     
     .block-container { padding: 2rem 3rem !important; max-width: 1200px; }
 
-    /* MeowAI Color Palette: Warm Cream, Soft Grey, Tuna Pink, Midnight Blue */
+    /* Grey Tabby Cat Palette: Silvery Grey, Slate, Charcoal */
     .stApp {
-        background-color: #FFFDF9 !important; /* Warm cream */
-        background-image: radial-gradient(#F5E6E8 1px, transparent 1px);
+        background-color: #F8FAFC !important; /* Silvery white/grey */
+        background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
         background-size: 20px 20px;
     }
 
     /* Sidebar Styling */
     [data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
-        border-right: 2px dashed #FAD2E1 !important;
+        border-right: 2px solid #E2E8F0 !important;
     }
     
     .sidebar-profile {
         text-align: center;
         padding: 1.5rem 0;
         margin-bottom: 1rem;
-        background: linear-gradient(180deg, #FFF0F3 0%, #FFFFFF 100%);
+        background: linear-gradient(180deg, #F1F5F9 0%, #FFFFFF 100%);
         border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(255, 181, 167, 0.1);
+        box-shadow: 0 4px 15px rgba(100, 116, 139, 0.08);
     }
     
     .mascot-container {
@@ -75,39 +84,48 @@ st.markdown("""
         width: 140px;
         height: 140px;
         margin: 0 auto 15px auto;
+        animation: float 5s ease-in-out infinite;
+    }
+    
+    .mascot-crop {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #CBD5E1;
+        box-shadow: 0 8px 25px rgba(100, 116, 139, 0.25);
+        background: #FFFFFF;
+        position: relative;
     }
     
     .mascot-avatar {
         width: 100%;
         height: 100%;
-        border-radius: 50%;
         object-fit: cover;
-        background: #FFFFFF;
-        border: 4px solid #FFB5A7;
-        box-shadow: 0 8px 25px rgba(255, 181, 167, 0.4);
-        display: block;
-        animation: float 4s ease-in-out infinite;
+        /* Crop to isolate the left cat */
+        object-position: 15% 40%;
+        transform: scale(2.2);
     }
     
     @keyframes float {
         0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-8px) rotate(2deg); }
+        50% { transform: translateY(-8px) rotate(1deg); }
         100% { transform: translateY(0px) rotate(0deg); }
     }
 
     .sidebar-title {
-        color: #5D576B;
+        color: #334155;
         font-weight: 800;
         font-size: 1.5rem;
         margin: 0;
         letter-spacing: -0.5px;
     }
     .sidebar-subtitle {
-        color: #FF9F1C;
-        font-size: 0.9rem;
+        color: #64748B;
+        font-size: 0.95rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.5px;
     }
 
     /* Chat Bubble / Hero Section */
@@ -116,10 +134,10 @@ st.markdown("""
         border-radius: 24px;
         border-bottom-left-radius: 4px;
         padding: 2rem;
-        box-shadow: 0 10px 30px rgba(93, 87, 107, 0.08);
+        box-shadow: 0 10px 30px rgba(100, 116, 139, 0.1);
         position: relative;
         margin-bottom: 2.5rem;
-        border: 2px solid #FAD2E1;
+        border: 2px solid #E2E8F0;
         display: flex;
         align-items: center;
         gap: 2rem;
@@ -131,7 +149,7 @@ st.markdown("""
         left: -20px;
         border-width: 20px 20px 0 0;
         border-style: solid;
-        border-color: #FAD2E1 transparent transparent transparent;
+        border-color: #E2E8F0 transparent transparent transparent;
     }
     .chat-bubble::after {
         content: '';
@@ -143,13 +161,13 @@ st.markdown("""
         border-color: #FFFFFF transparent transparent transparent;
     }
     .chat-bubble h3 {
-        color: #FF707A !important;
+        color: #1E293B !important;
         margin: 0 0 0.5rem 0 !important;
         font-size: 1.6rem !important;
         font-weight: 700 !important;
     }
     .chat-bubble p {
-        color: #5D576B !important;
+        color: #475569 !important;
         margin: 0 !important;
         font-size: 1.1rem !important;
         line-height: 1.6 !important;
@@ -158,21 +176,22 @@ st.markdown("""
     /* Inputs */
     .stTextInput > div > div > input {
         border-radius: 12px !important;
-        border: 2px solid #F1E3E4 !important;
+        border: 2px solid #E2E8F0 !important;
         padding: 0.7rem 1.2rem !important;
-        background-color: #FFFFFF !important;
-        color: #5D576B !important;
+        background-color: #F8FAFC !important;
+        color: #334155 !important;
         font-weight: 500;
         transition: all 0.3s;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #FFB5A7 !important;
-        box-shadow: 0 0 0 4px rgba(255, 181, 167, 0.15) !important;
+        border-color: #94A3B8 !important;
+        box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.15) !important;
+        background-color: #FFFFFF !important;
     }
 
     /* Primary Button */
     div[data-testid="stButton"] > button {
-        background: linear-gradient(135deg, #FF707A 0%, #FF9F1C 100%) !important;
+        background: linear-gradient(135deg, #64748B 0%, #475569 100%) !important;
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 14px !important;
@@ -180,17 +199,17 @@ st.markdown("""
         font-weight: 700 !important;
         font-size: 1.1rem !important;
         width: 100%;
-        box-shadow: 0 6px 20px rgba(255, 112, 122, 0.3) !important;
+        box-shadow: 0 6px 20px rgba(71, 85, 105, 0.3) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     div[data-testid="stButton"] > button:hover {
         transform: translateY(-3px) scale(1.02) !important;
-        box-shadow: 0 10px 25px rgba(255, 112, 122, 0.4) !important;
+        box-shadow: 0 10px 25px rgba(71, 85, 105, 0.45) !important;
     }
     
     /* Checkbox */
     [data-testid="stCheckbox"] label span {
-        color: #5D576B !important;
+        color: #475569 !important;
         font-weight: 500 !important;
     }
 
