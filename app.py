@@ -22,9 +22,9 @@ except ImportError:
     MASCOT_B64 = ""
 
 if MASCOT_B64:
-    mascot_img_html = f'<div class="mascot-container"><div class="mascot-crop"><img src="data:image/png;base64,{MASCOT_B64}" class="mascot-avatar" /></div></div>'
+    mascot_img_html = f'<div class="mascot-container"><img src="data:image/png;base64,{MASCOT_B64}" class="mascot-avatar" /></div>'
 else:
-    mascot_img_html = '<div class="mascot-container"><div class="mascot-crop" style="display:flex; align-items:center; justify-content:center; font-size:60px; background:#E2E8F0;">🐱</div></div>'
+    mascot_img_html = '<div class="mascot-container" style="display:flex; align-items:center; justify-content:center; font-size:80px;">🐱</div>'
 
 # ─── Premium Grey Cat AI Theme CSS ───
 st.markdown("""
@@ -62,25 +62,21 @@ st.markdown("""
     }
     
     .mascot-container {
-        position: relative;
-        width: 160px;
-        height: 160px;
+        width: 180px;
+        height: 180px;
         margin: 0 auto 15px auto;
         animation: float 5s ease-in-out infinite;
-    }
-    
-    .mascot-crop {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .mascot-avatar {
-        width: 100%;
-        height: 100%;
+        width: 180px;
+        height: 180px;
         object-fit: contain;
         mix-blend-mode: multiply;
+        display: block;
     }
     
     @keyframes float {
@@ -219,7 +215,7 @@ st.markdown("""
 <div class="chat-bubble">
     <div style="font-size: 3.5rem; animation: float 3s ease-in-out infinite;">😸</div>
     <div>
-        <h3>เมี้ยวว~ สวัสดีชาว Hotelier!</h3>
+        <h3>สวัสดี DATA TEAM! 🐾</h3>
         <p>หนู MeowAI พร้อมทำงานแล้วค่ะ! แค่โยนไฟล์ PDF สัญญาโรงแรมมาให้หนูเดี๋ยวหนูจะใช้พลังเหมียวสกัดข้อมูล Rate, Date, Terms ทั้งหมดให้ออกมาเป็น Excel สวยๆ พร้อมนำไปใช้งานต่อได้เลย!</p>
     </div>
 </div>
