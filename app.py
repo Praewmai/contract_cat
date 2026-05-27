@@ -26,6 +26,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("Contract PDF → Excel  🐾")
+st.image("cat_theme.jpg", use_column_width=True)
 st.write("Upload a contract PDF and let the AI Cat extract rates, dates, and terms into a dashboard-ready Excel file.")
 
 # 1. API Key
