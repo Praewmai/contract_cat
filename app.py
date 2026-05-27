@@ -134,62 +134,66 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown('<div class="card">', unsafe_allow_html=True)
 st.title("Contract PDF → Excel  🐾")
 st.write("Upload a contract PDF and let the AI Cat extract rates, dates, and terms into a dashboard-ready Excel file.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 1. API Key
+st.markdown('<div class="card">', unsafe_allow_html=True)
 api_key = st.text_input("🔑 Gemini API Key", type="password", help="Your API key is used client-side and not saved on our servers.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 2. PDF Upload
-uploaded_file = st.file_uploader("📄 Upload Contract PDF", type=["pdf"])
+st.markdown('<div class="card">', unsafe_allow_html=True)
+uploaded_file = st.file_uploader("📄 Upload Contract PDF", type=["pdf"]) 
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 3. Property Type
-prop_type = st.radio("🏢 Property Type", ["Hotel / Resort", "Cruise Ship"])
+st.markdown('<div class="card">', unsafe_allow_html=True)
+prop_type = st.radio("🏢 Property Type", ["Hotel / Resort", "Cruise Ship"]) 
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 4. Info Grid
+st.markdown('<div class="card">', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
     hotel_id = st.text_input("Hotel/Cruise ID (e.g. 12711588)")
 with col2:
     supplier = st.text_input("Supplier Name")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 5. Rooms Config
+st.markdown('<div class="card">', unsafe_allow_html=True)
 st.subheader("🚪 Rooms Configuration")
-
-# Initialize rooms list in session state
 if 'rooms' not in st.session_state:
     st.session_state.rooms = [{"room_name": "", "room_id": ""}]
 
-# Callback to add a room row
 def add_room_callback():
     st.session_state.rooms.append({"room_name": "", "room_id": ""})
 
-# Callback to remove a room row
 def remove_room_callback(index):
     if len(st.session_state.rooms) > 1:
         st.session_state.rooms.pop(index)
-
-# Render each room row
 for idx in range(len(st.session_state.rooms)):
-    # Safely avoid index out of range if deleted during iteration
     if idx >= len(st.session_state.rooms):
         break
     room = st.session_state.rooms[idx]
-    
     r_col1, r_col2, r_col3 = st.columns([5, 4, 1])
     with r_col1:
         room["room_name"] = st.text_input(f"Room Name #{idx+1}", value=room["room_name"], key=f"rn_{idx}")
     with r_col2:
         room["room_id"] = st.text_input(f"Room ID #{idx+1}", value=room["room_id"], key=f"ri_{idx}")
     with r_col3:
-        st.write("##")  # spacer to align button with text inputs
+        st.write("##")
         if st.button("🗑️", key=f"del_{idx}"):
             remove_room_callback(idx)
             st.rerun()
-
 st.button("+ Add Room Row", on_click=add_room_callback)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 6. Contract Types
+st.markdown('<div class="card">', unsafe_allow_html=True)
 st.subheader("📝 Contract Types to Generate")
 ct_main = st.checkbox("Main Contract (Base Rate)", value=True)
 
@@ -222,10 +226,12 @@ if ct_promo:
     cts.append({"type": "promo", "label": "Promotion", "promo_code": promo_code, "promo_till": promo_till})
 if ct_por:
     cts.append({"type": "por", "label": "POR"})
+st.markdown('</div>', unsafe_allow_html=True)
 
 valid_rooms = [r for r in st.session_state.rooms if r["room_name"].strip() and r["room_id"].strip()]
 
 # 7. Start Analysis Button
+st.markdown('<div class="card">', unsafe_allow_html=True)
 if st.button("Let the AI Cat Extract Data! 🐾", use_container_width=True):
     if not api_key:
         st.error("Please enter your Gemini API Key.")
@@ -372,3 +378,4 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                 
             except Exception as e:
                 st.error(f"Analysis failed: {str(e)}")
+st.markdown('</div>', unsafe_allow_html=True)
