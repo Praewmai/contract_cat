@@ -8,345 +8,432 @@ import io
 
 # ─── Page Config ───
 st.set_page_config(
-    page_title="AI Cat Assistant | Contract PDF → Excel",
+    page_title="AI Cat Assistant 🐾 Contract PDF → Excel",
     page_icon="🐾",
     layout="centered"
 )
 
-# ─── Premium CSS (targets actual Streamlit DOM) ───
+# ─── Cat-Themed Premium CSS ───
 st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-    /* ── Hide Streamlit chrome ── */
-    #MainMenu, footer, header {visibility: hidden;}
+    /* ── Hide Streamlit UI chrome ── */
+    #MainMenu, footer, header {visibility: hidden !important;}
+    .block-container { padding-top: 2rem !important; }
 
-    /* ── Root app background ── */
+    /* ── Warm cream background with subtle pattern ── */
     .stApp {
-        background:
-            radial-gradient(ellipse at 15% 50%, rgba(99,102,241,0.18) 0%, transparent 55%),
-            radial-gradient(ellipse at 85% 25%, rgba(16,185,129,0.12) 0%, transparent 55%),
-            radial-gradient(ellipse at 50% 95%, rgba(244,114,182,0.08) 0%, transparent 50%),
-            #0f172a !important;
+        background-color: #FDF8F3 !important;
+        background-image:
+            radial-gradient(circle at 20% 80%, rgba(74,88,153,0.04) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(245,168,176,0.06) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(245,200,66,0.03) 0%, transparent 60%);
     }
 
-    /* ── Global typography ── */
-    html, body, [class*="css"] {
-        font-family: 'Outfit', sans-serif !important;
+    /* ── Global font ── */
+    html, body, [class*="css"], .stMarkdown, p, span, label, h1, h2, h3, h4, h5, h6, div, input, button, textarea {
+        font-family: 'Nunito', sans-serif !important;
     }
 
-    /* ── Animated gradient title ── */
-    h1 {
-        background: linear-gradient(135deg, #a5b4fc, #818cf8, #c4b5fd, #e0e7ff);
-        background-size: 300% 300%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradient-shift 6s ease infinite;
-        text-align: center !important;
-        font-weight: 800 !important;
-        font-size: 2.4rem !important;
-        letter-spacing: -0.5px;
-        padding-bottom: 0.5rem;
-    }
-    @keyframes gradient-shift {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    /* ── Subheaders ── */
-    h2, h3 {
-        color: #c7d2fe !important;
-        font-weight: 700 !important;
-    }
-
-    /* ── All text ── */
-    p, span, label, .stMarkdown {
-        color: #e2e8f0 !important;
-    }
-
-    /* ── Container / expander cards ── */
-    [data-testid="stExpander"] {
-        background: rgba(30, 41, 59, 0.65) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255,255,255,0.07) !important;
-        border-radius: 20px !important;
-        margin-bottom: 1rem !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important;
+    /* ── Custom header banner ── */
+    .cat-banner {
+        background: linear-gradient(135deg, #4A5899 0%, #6B7DB8 60%, #8B9DD6 100%);
+        border-radius: 24px;
+        padding: 2.5rem 2rem 2rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        position: relative;
         overflow: hidden;
+        box-shadow: 0 8px 30px rgba(74,88,153,0.2);
     }
-    [data-testid="stExpander"] summary {
-        font-weight: 600 !important;
-        font-size: 1.05rem !important;
-        color: #e2e8f0 !important;
-        padding: 1rem 1.25rem !important;
+    .cat-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+        animation: shimmer 8s ease-in-out infinite;
     }
-    [data-testid="stExpander"] summary:hover {
-        color: #a5b4fc !important;
+    @keyframes shimmer {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(10%, 10%); }
     }
-    [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
-        padding: 0 1.25rem 1.25rem !important;
+    .cat-banner h2 {
+        color: #FFFFFF !important;
+        font-size: 2rem !important;
+        font-weight: 800 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .cat-banner p {
+        color: rgba(255,255,255,0.85) !important;
+        font-size: 1rem !important;
+        margin-top: 0.5rem !important;
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
     }
 
-    /* ── Text inputs ── */
+    /* ── Paw divider ── */
+    .paw-divider {
+        text-align: center;
+        font-size: 1.2rem;
+        letter-spacing: 12px;
+        color: #C8B8A8;
+        margin: 0.8rem 0;
+        user-select: none;
+    }
+
+    /* ── Section cards ── */
+    .section-card {
+        background: #FFFFFF;
+        border: 1.5px solid #EDE8E1;
+        border-radius: 20px;
+        padding: 1.5rem 1.8rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
+    }
+    .section-card:hover {
+        box-shadow: 0 6px 24px rgba(74,88,153,0.1);
+        border-color: #C8C0D8;
+    }
+    .section-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #4A5899;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-title .icon {
+        font-size: 1.3rem;
+    }
+
+    /* ── Streamlit text inputs ── */
+    .stTextInput label {
+        color: #5C5C5C !important;
+        font-weight: 600 !important;
+        font-size: 0.88rem !important;
+    }
     .stTextInput > div > div > input {
         border-radius: 14px !important;
-        border: 1px solid rgba(129,140,248,0.25) !important;
-        background: rgba(15, 23, 42, 0.7) !important;
-        color: #f8fafc !important;
-        padding: 0.7rem 1rem !important;
-        font-family: 'Outfit', sans-serif !important;
-        transition: all 0.3s ease !important;
+        border: 1.5px solid #E0DAD2 !important;
+        background: #FAFAF8 !important;
+        color: #3D3D3D !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 0.95rem !important;
+        transition: all 0.25s ease !important;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #818cf8 !important;
-        box-shadow: 0 0 0 3px rgba(129,140,248,0.15), 0 0 20px rgba(129,140,248,0.1) !important;
+        border-color: #4A5899 !important;
+        box-shadow: 0 0 0 3px rgba(74,88,153,0.1) !important;
+        background: #FFFFFF !important;
     }
-    .stTextInput label {
-        color: #a5b4fc !important;
-        font-weight: 600 !important;
-        font-size: 0.9rem !important;
+    .stTextInput > div > div > input::placeholder {
+        color: #B8B0A8 !important;
     }
 
     /* ── File uploader ── */
     [data-testid="stFileUploader"] {
-        background: rgba(30, 41, 59, 0.4) !important;
-        border: 2px dashed rgba(129,140,248,0.3) !important;
+        background: linear-gradient(135deg, #FAFAF8 0%, #F5F0EB 100%) !important;
+        border: 2px dashed #D0C8BE !important;
         border-radius: 18px !important;
         padding: 1.5rem !important;
         transition: all 0.3s ease !important;
     }
     [data-testid="stFileUploader"]:hover {
-        border-color: #818cf8 !important;
-        background: rgba(30, 41, 59, 0.6) !important;
-        box-shadow: 0 0 25px rgba(129,140,248,0.1) !important;
+        border-color: #4A5899 !important;
+        background: linear-gradient(135deg, #FFFFFF 0%, #F8F4EF 100%) !important;
+        box-shadow: 0 4px 16px rgba(74,88,153,0.08) !important;
     }
     [data-testid="stFileUploader"] label {
-        color: #a5b4fc !important;
+        color: #5C5C5C !important;
         font-weight: 600 !important;
+    }
+    [data-testid="stFileUploader"] small {
+        color: #9B9490 !important;
     }
 
     /* ── Radio buttons ── */
-    .stRadio label {
-        color: #a5b4fc !important;
+    .stRadio > label {
+        color: #5C5C5C !important;
         font-weight: 600 !important;
     }
-    .stRadio [data-baseweb="radio"] label {
-        color: #cbd5e1 !important;
-        font-weight: 400 !important;
+    .stRadio [role="radiogroup"] label {
+        color: #5C5C5C !important;
+        font-weight: 500 !important;
+    }
+    .stRadio [role="radiogroup"] label:hover {
+        color: #4A5899 !important;
     }
 
     /* ── Checkboxes ── */
-    .stCheckbox label {
-        color: #cbd5e1 !important;
+    .stCheckbox label span {
+        color: #5C5C5C !important;
         font-weight: 500 !important;
     }
 
-    /* ── Primary action button ── */
-    .stButton > button[kind="primary"],
-    .stButton > button {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%) !important;
-        background-size: 200% 200% !important;
-        color: #fff !important;
+    /* ── Primary CTA button (extract) ── */
+    div[data-testid="stButton"] > button {
+        background: linear-gradient(135deg, #4A5899 0%, #6B7DB8 100%) !important;
+        color: #FFFFFF !important;
         border: none !important;
         border-radius: 100px !important;
-        padding: 0.75rem 2rem !important;
+        padding: 0.85rem 2rem !important;
         font-weight: 700 !important;
-        font-size: 1rem !important;
-        font-family: 'Outfit', sans-serif !important;
+        font-size: 1.05rem !important;
         letter-spacing: 0.3px;
-        box-shadow: 0 8px 25px -5px rgba(99,102,241,0.45) !important;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 6px 20px rgba(74,88,153,0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
     }
-    .stButton > button:hover {
-        background-position: 100% 50% !important;
+    div[data-testid="stButton"] > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 12px 30px -5px rgba(99,102,241,0.55) !important;
+        box-shadow: 0 10px 28px rgba(74,88,153,0.35) !important;
+        background: linear-gradient(135deg, #5A68A9 0%, #7B8DC8 100%) !important;
     }
-    .stButton > button:active {
-        transform: translateY(0px) !important;
+    div[data-testid="stButton"] > button:active {
+        transform: translateY(0) !important;
     }
 
     /* ── Download button ── */
     .stDownloadButton > button {
-        background: linear-gradient(135deg, #10b981, #059669) !important;
-        color: #fff !important;
+        background: linear-gradient(135deg, #5DA87E 0%, #7EC89E 100%) !important;
+        color: #FFFFFF !important;
         border: none !important;
         border-radius: 100px !important;
-        padding: 0.75rem 2rem !important;
+        padding: 0.85rem 2rem !important;
         font-weight: 700 !important;
-        box-shadow: 0 8px 25px -5px rgba(16,185,129,0.4) !important;
-        transition: all 0.35s ease !important;
+        box-shadow: 0 6px 20px rgba(93,168,126,0.3) !important;
+        transition: all 0.3s ease !important;
     }
     .stDownloadButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 12px 30px -5px rgba(16,185,129,0.5) !important;
+        box-shadow: 0 10px 28px rgba(93,168,126,0.35) !important;
     }
 
-    /* ── Success / Error messages ── */
-    .stSuccess {
-        background: rgba(16,185,129,0.15) !important;
-        border: 1px solid rgba(16,185,129,0.3) !important;
-        border-radius: 14px !important;
-    }
-    .stError, [data-testid="stAlert"] {
-        border-radius: 14px !important;
+    /* ── Success message ── */
+    [data-testid="stAlert"][data-baseweb*="notification"] {
+        border-radius: 16px !important;
     }
 
-    /* ── Spinner ── */
-    .stSpinner > div {
-        border-top-color: #818cf8 !important;
+    /* ── Subheader in sections ── */
+    h3 {
+        color: #4A5899 !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        border: none !important;
+        padding: 0 !important;
+        margin-top: 0.5rem !important;
     }
 
-    /* ── Scrollbar ── */
+    /* ── Custom scrollbar ── */
     ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    ::-webkit-scrollbar-track { background: #FDF8F3; }
+    ::-webkit-scrollbar-thumb { background: #D8D0C8; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #C0B8B0; }
 
-    /* ── Sidebar (if ever used) ── */
-    [data-testid="stSidebar"] {
-        background: rgba(15,23,42,0.95) !important;
-        backdrop-filter: blur(20px) !important;
+    /* ── Cat badge ── */
+    .cat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(74,88,153,0.08);
+        color: #4A5899;
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 4px 14px;
+        border-radius: 100px;
+        margin-bottom: 0.8rem;
     }
 
-    /* ── Divider ── */
-    hr {
-        border-color: rgba(255,255,255,0.06) !important;
-        margin: 1.5rem 0 !important;
+    /* ── Footer ── */
+    .cat-footer {
+        text-align: center;
+        padding: 1.5rem 0 1rem;
+        color: #B8B0A8;
+        font-size: 0.85rem;
+        font-weight: 500;
     }
-
-    /* ── Columns gap ── */
-    [data-testid="column"] {
-        padding: 0 0.5rem !important;
+    .cat-footer a {
+        color: #4A5899;
+        text-decoration: none;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ─── Header ───
-st.title("Contract PDF → Excel  🐾")
-st.markdown(
-    "<p style='text-align:center; color:#94a3b8 !important; font-size:1.05rem; margin-top:-1rem; margin-bottom:2rem;'>"
-    "Upload a contract PDF and let the AI Cat extract rates, dates, and terms into a dashboard-ready Excel file."
-    "</p>",
-    unsafe_allow_html=True
+# ─── Banner ───
+st.markdown("""
+<div class="cat-banner">
+    <h2>🐾 AI Cat Assistant</h2>
+    <p>Upload a contract PDF and let me extract rates, dates & terms into Excel for you~ ✨</p>
+</div>
+""", unsafe_allow_html=True)
+
+# ─── Paw divider helper ───
+def paw_divider():
+    st.markdown('<div class="paw-divider">🐾🐾🐾</div>', unsafe_allow_html=True)
+
+# ─── Section header helper ───
+def section_start(icon, title):
+    st.markdown(f"""
+    <div style="
+        display:flex; align-items:center; gap:10px;
+        margin-bottom:0.6rem; margin-top:0.3rem;
+    ">
+        <span style="
+            background:rgba(74,88,153,0.1);
+            border-radius:12px;
+            padding:6px 10px;
+            font-size:1.2rem;
+        ">{icon}</span>
+        <span style="
+            font-weight:700;
+            color:#4A5899;
+            font-size:1.05rem;
+        ">{title}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ═══════════════════════════════════════
+#  1 · API KEY
+# ═══════════════════════════════════════
+section_start("🔑", "API Key")
+api_key = st.text_input(
+    "Gemini API Key",
+    type="password",
+    placeholder="Paste your Gemini API key here…",
+    help="Used client-side only. Never stored.",
+    label_visibility="collapsed"
 )
 
-# ─── 1. API Key ───
-with st.expander("🔑 API Key", expanded=True):
-    api_key = st.text_input(
-        "Gemini API Key",
-        type="password",
-        help="Your API key is used client-side only and never saved.",
-        label_visibility="collapsed",
-        placeholder="Paste your Gemini API key here…"
-    )
+paw_divider()
 
-# ─── 2. PDF Upload ───
-with st.expander("📄 Upload Contract PDF", expanded=True):
-    uploaded_file = st.file_uploader(
-        "Upload PDF",
-        type=["pdf"],
-        label_visibility="collapsed"
-    )
+# ═══════════════════════════════════════
+#  2 · PDF UPLOAD
+# ═══════════════════════════════════════
+section_start("📄", "Upload Contract PDF")
+uploaded_file = st.file_uploader(
+    "Upload PDF",
+    type=["pdf"],
+    label_visibility="collapsed"
+)
 
-# ─── 3. Property Info ───
-with st.expander("🏢 Property Information", expanded=True):
-    prop_type = st.radio(
-        "Property Type",
-        ["Hotel / Resort", "Cruise Ship"],
-        horizontal=True
-    )
-    st.markdown("")  # spacer
-    col1, col2 = st.columns(2)
-    with col1:
-        hotel_id = st.text_input("Hotel / Cruise ID", placeholder="e.g. 12711588")
-    with col2:
-        supplier = st.text_input("Supplier Name", placeholder="e.g. Agoda, Expedia")
+paw_divider()
 
-# ─── 4. Rooms ───
-with st.expander("🚪 Rooms Configuration", expanded=True):
-    if 'rooms' not in st.session_state:
-        st.session_state.rooms = [{"room_name": "", "room_id": ""}]
+# ═══════════════════════════════════════
+#  3 · PROPERTY INFO
+# ═══════════════════════════════════════
+section_start("🏨", "Property Information")
+prop_type = st.radio("Property Type", ["Hotel / Resort", "Cruise Ship"], horizontal=True)
+col1, col2 = st.columns(2)
+with col1:
+    hotel_id = st.text_input("Hotel / Cruise ID", placeholder="e.g. 12711588")
+with col2:
+    supplier = st.text_input("Supplier Name", placeholder="e.g. Agoda, Expedia")
 
-    def add_room():
-        st.session_state.rooms.append({"room_name": "", "room_id": ""})
+paw_divider()
 
-    def remove_room(i):
-        if len(st.session_state.rooms) > 1:
-            st.session_state.rooms.pop(i)
+# ═══════════════════════════════════════
+#  4 · ROOMS
+# ═══════════════════════════════════════
+section_start("🚪", "Rooms Configuration")
 
-    for idx in range(len(st.session_state.rooms)):
-        if idx >= len(st.session_state.rooms):
-            break
-        room = st.session_state.rooms[idx]
-        c1, c2, c3 = st.columns([5, 4, 1])
-        with c1:
-            room["room_name"] = st.text_input(
-                f"Room Name #{idx+1}", value=room["room_name"], key=f"rn_{idx}",
-                placeholder="e.g. Deluxe Twin"
-            )
-        with c2:
-            room["room_id"] = st.text_input(
-                f"Room ID #{idx+1}", value=room["room_id"], key=f"ri_{idx}",
-                placeholder="e.g. 101"
-            )
-        with c3:
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🗑️", key=f"del_{idx}"):
-                remove_room(idx)
-                st.rerun()
+if 'rooms' not in st.session_state:
+    st.session_state.rooms = [{"room_name": "", "room_id": ""}]
 
-    st.button("＋ Add Room", on_click=add_room, use_container_width=True)
+def add_room():
+    st.session_state.rooms.append({"room_name": "", "room_id": ""})
 
-# ─── 5. Contract Types ───
-with st.expander("📝 Contract Types", expanded=True):
-    ct_main = st.checkbox("Main Contract (Base Rate)", value=True)
-    ct_eb = st.checkbox("Early Bird (Advance Booking)", value=False)
-    eb_code = "E.B DAYS"
-    if ct_eb:
-        eb_code = st.text_input("Early Bird Promo Prefix", value="E.B DAYS", placeholder="e.g. E.B DAYS")
+def remove_room(i):
+    if len(st.session_state.rooms) > 1:
+        st.session_state.rooms.pop(i)
 
-    ct_promo = st.checkbox("Promotion (Special Offer)", value=False)
-    promo_code = ""
-    promo_till = ""
-    if ct_promo:
-        pc1, pc2 = st.columns(2)
-        with pc1:
-            promo_code = st.text_input("Promo Code", placeholder="e.g. FLASH2026")
-        with pc2:
-            promo_till = st.text_input("Book Till Date", placeholder="YYYY-MM-DD")
+for idx in range(len(st.session_state.rooms)):
+    if idx >= len(st.session_state.rooms):
+        break
+    room = st.session_state.rooms[idx]
+    c1, c2, c3 = st.columns([5, 4, 1])
+    with c1:
+        room["room_name"] = st.text_input(
+            f"Room Name #{idx+1}", value=room["room_name"], key=f"rn_{idx}",
+            placeholder="e.g. Deluxe Twin"
+        )
+    with c2:
+        room["room_id"] = st.text_input(
+            f"Room ID #{idx+1}", value=room["room_id"], key=f"ri_{idx}",
+            placeholder="e.g. 101"
+        )
+    with c3:
+        st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+        if st.button("🗑️", key=f"del_{idx}"):
+            remove_room(idx)
+            st.rerun()
 
-    ct_por = st.checkbox("POR (Price on Request)", value=True)
+st.button("＋ Add Room", on_click=add_room, use_container_width=True)
 
-    cts = []
-    if ct_main:
-        cts.append({"type": "main", "label": "Main Contract"})
-    if ct_eb:
-        cts.append({"type": "eb", "label": "Early Bird", "code": eb_code})
-    if ct_promo:
-        cts.append({"type": "promo", "label": "Promotion", "promo_code": promo_code, "promo_till": promo_till})
-    if ct_por:
-        cts.append({"type": "por", "label": "POR"})
+paw_divider()
 
-# ─── Collect valid rooms ───
+# ═══════════════════════════════════════
+#  5 · CONTRACT TYPES
+# ═══════════════════════════════════════
+section_start("📝", "Contract Types")
+
+ct_main = st.checkbox("Main Contract (Base Rate)", value=True)
+ct_eb = st.checkbox("Early Bird (Advance Booking)", value=False)
+eb_code = "E.B DAYS"
+if ct_eb:
+    eb_code = st.text_input("Early Bird Promo Prefix", value="E.B DAYS", placeholder="e.g. E.B DAYS")
+
+ct_promo = st.checkbox("Promotion (Special Offer)", value=False)
+promo_code = ""
+promo_till = ""
+if ct_promo:
+    pc1, pc2 = st.columns(2)
+    with pc1:
+        promo_code = st.text_input("Promo Code", placeholder="e.g. FLASH2026")
+    with pc2:
+        promo_till = st.text_input("Book Till Date", placeholder="YYYY-MM-DD")
+
+ct_por = st.checkbox("POR (Price on Request)", value=True)
+
+cts = []
+if ct_main:
+    cts.append({"type": "main", "label": "Main Contract"})
+if ct_eb:
+    cts.append({"type": "eb", "label": "Early Bird", "code": eb_code})
+if ct_promo:
+    cts.append({"type": "promo", "label": "Promotion", "promo_code": promo_code, "promo_till": promo_till})
+if ct_por:
+    cts.append({"type": "por", "label": "POR"})
+
+# ═══════════════════════════════════════
+#  6 · EXTRACT BUTTON
+# ═══════════════════════════════════════
 valid_rooms = [r for r in st.session_state.rooms if r["room_name"].strip() and r["room_id"].strip()]
 
-# ─── 6. Extract Button ───
-st.markdown("")  # spacer
+st.markdown("<br>", unsafe_allow_html=True)
 if st.button("🐾  Let the AI Cat Extract Data!", use_container_width=True):
     if not api_key:
-        st.error("⚠️ Please enter your Gemini API Key.")
+        st.error("⚠️ กรุณาใส่ Gemini API Key")
     elif not uploaded_file:
-        st.error("⚠️ Please upload a PDF file.")
+        st.error("⚠️ กรุณาอัพโหลดไฟล์ PDF")
     elif not hotel_id:
-        st.error("⚠️ Please enter a Hotel / Cruise ID.")
+        st.error("⚠️ กรุณาใส่ Hotel / Cruise ID")
     elif not valid_rooms:
-        st.error("⚠️ Please add at least one Room Name & Room ID pair.")
+        st.error("⚠️ กรุณาเพิ่มอย่างน้อย 1 ห้อง (Room Name & Room ID)")
     elif not cts:
-        st.error("⚠️ Please select at least one contract type.")
+        st.error("⚠️ กรุณาเลือกอย่างน้อย 1 contract type")
     else:
-        with st.spinner("✨ AI is reading the contract and extracting rate entries… (up to 60 s)"):
+        with st.spinner("🐱 น้องแมวกำลังอ่าน contract อยู่นะ… รอสักครู่ (ไม่เกิน 60 วินาที)"):
             try:
                 file_bytes = uploaded_file.read()
                 b64_data = base64.b64encode(file_bytes).decode("utf-8")
@@ -460,7 +547,8 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                 wb.save(buf)
                 buf.seek(0)
 
-                st.success(f"✅ Success! Extracted **{len(rows)}** rows from the contract.")
+                st.success(f"✅ สำเร็จ! ดึงข้อมูลได้ **{len(rows)}** แถวจาก contract")
+                st.balloons()
                 st.download_button(
                     label="📥  Download Excel (.xlsx)",
                     data=buf,
@@ -470,13 +558,13 @@ Return ONLY a JSON object with this EXACT structure (no markdown fences, just th
                 )
 
             except Exception as e:
-                st.error(f"❌ Analysis failed: {str(e)}")
+                st.error(f"❌ เกิดข้อผิดพลาด: {str(e)}")
 
 # ─── Footer ───
-st.markdown("---")
-st.markdown(
-    "<p style='text-align:center; color:#475569 !important; font-size:0.85rem;'>"
-    "Made with 🐾 by AI Cat Assistant &nbsp;•&nbsp; Powered by Gemini 2.5 Flash"
-    "</p>",
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="cat-footer">
+    <div style="font-size:1.5rem; margin-bottom:0.3rem;">🐾</div>
+    Made with ♡ by <strong>AI Cat Assistant</strong><br>
+    <span style="font-size:0.8rem;">Powered by Gemini 2.5 Flash</span>
+</div>
+""", unsafe_allow_html=True)
