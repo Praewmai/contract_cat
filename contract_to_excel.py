@@ -309,9 +309,10 @@ def write_excel(rows, output_path):
     for r_idx, row in enumerate(rows, 2):
         for c_idx, h in enumerate(HEADERS, 1):
             val  = row.get(h)
-            if isinstance(val, (dict, list)):
-                import json
-                val = json.dumps(val)
+            if isinstance(val, dict):
+                val = ", ".join([f"{k.capitalize()}: {v}" for k, v in val.items()])
+            elif isinstance(val, list):
+                val = ", ".join(map(str, val))
             cell = ws.cell(r_idx, c_idx, val)
             cell.font = data_font
 
