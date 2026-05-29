@@ -588,6 +588,7 @@ CRITICAL RULES:
    - surcharge_rates = per-room weekend supplement dict e.g. {{"room_id_1": 1500, "room_id_2": 3000}}
    - If same surcharge for all rooms use surcharge_amount (single value) instead
    - Extract the exact weekend days stated in the PDF (e.g., "Friday & Saturday", "Saturday") into `weekend_days`. Extract the remaining weekday string into `weekday_days` (e.g., "Sun-Thu", "Sun-Fri").
+   - If there is a surcharge (weekend, gala dinner, peak season, etc.), extract the exact reason/note into `surcharge_note` (e.g. "Room rate include surcharge on Christmas Eve").
 4. HTML FORMATTING PATTERNS (STRICT):
    Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
    - child_policy: (Do NOT include any food/meal-related information here)
@@ -638,6 +639,7 @@ Return ONLY valid JSON (no markdown fences, no explanation):
       "surcharge_amount": 0,
       "surcharge_rates": {{}},
       "surcharge_currency": "THB",
+      "surcharge_note": null,
       "min_nights_stay": null,
       "cutoff_date": null,
       "room_allotment": null,
