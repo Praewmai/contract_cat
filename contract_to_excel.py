@@ -192,16 +192,14 @@ def generate_rows(parsed, selected_cts):
                         parsed, room, period, base_rate, 'Main Contract'
                     ))
 
-            # ── EARLY BIRD ─────────────────────────────────
+            # ── EARLY BIRD ──────────────────────────────
             if 'eb' in ct_types and not is_peak and not is_blackout:
-                eb_cfg = ct_map.get('eb', {})
-                code_prefix = eb_cfg.get('code', 'E.B DAYS')
-
                 for tier in eb_tiers:
                     days       = tier.get('days', 0)
                     discount   = tier.get('discount_pct', 0)
                     eb_rate    = round(base_rate * (1 - discount / 100))
-                    promo_code = tier.get('promo_code') or f'{code_prefix} {days} DAYS'
+                    # AI extracts promo_code from PDF; fallback = "E.B {days} DAYS"
+                    promo_code = tier.get('promo_code') or f'E.B {days} DAYS'
                     # EB usually has no promo_book_till (unless PDF explicitly states one)
                     eb_book_till = tier.get('promo_book_till') or None
 
