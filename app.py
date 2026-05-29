@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ─── Mascot Setup ───
+# ─── Mascot Setup (Updated) ───
 try:
     from mascot_data import MASCOT_B64
 except ImportError:
