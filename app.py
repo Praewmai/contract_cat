@@ -51,20 +51,26 @@ st.markdown("""
     [data-testid="stSidebar"] * { color: #E2E8F0 !important; }
     [data-testid="stSidebar"] h4 { color: #94A3B8 !important; font-size: 0.8rem !important; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1rem !important; font-weight: 700; }
     [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.1) !important; margin: 1.5rem 0 !important; }
-    [data-testid="stSidebar"] .stTextInput input {
+    [data-testid="stSidebar"] [data-baseweb="input"] {
         background-color: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        color: #F8FAFC !important;
         border-radius: 12px !important;
-        padding: 0.6rem 1rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         transition: all 0.3s ease;
     }
-    [data-testid="stSidebar"] .stTextInput input:focus {
-        background-color: rgba(255, 255, 255, 0.15) !important;
+    [data-testid="stSidebar"] [data-baseweb="input"] > div {
+        background-color: transparent !important;
+    }
+    [data-testid="stSidebar"] [data-baseweb="input"] input {
+        background-color: transparent !important;
+        color: #F8FAFC !important;
+        border: none !important;
+    }
+    [data-testid="stSidebar"] [data-baseweb="input"]:focus-within {
+        background-color: rgba(255, 255, 255, 0.12) !important;
         border-color: #94A3B8 !important;
         box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
     }
-    [data-testid="stSidebar"] .stTextInput input::placeholder {
+    [data-testid="stSidebar"] [data-baseweb="input"] input::placeholder {
         color: rgba(255, 255, 255, 0.4) !important;
     }
 
