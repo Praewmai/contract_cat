@@ -675,11 +675,21 @@ Return ONLY valid JSON (no markdown fences, no explanation):
                     }
                 }
 
-                resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
-                resp_data = resp.json()
+                import time
+                max_retries = 3
+                for attempt in range(max_retries):
+                    resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
+                    resp_data = resp.json()
 
-                if resp.status_code != 200:
-                    raise Exception(resp_data.get("error", {}).get("message", "Gemini API Error"))
+                    if resp.status_code != 200:
+                        error_msg = resp_data.get("error", {}).get("message", "Gemini API Error")
+                        if "high demand" in error_msg.lower() or resp.status_code >= 500:
+                            if attempt < max_retries - 1:
+                                time.sleep(4 * (attempt + 1))  # Wait 4s, 8s
+                                continue
+                        raise Exception(error_msg)
+                    else:
+                        break
 
                 text_output = resp_data["candidates"][0]["content"]["parts"][0]["text"]
                 parsed_data = json.loads(text_output)
