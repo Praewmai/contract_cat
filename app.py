@@ -126,7 +126,6 @@ st.markdown("""
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-radius: 24px;
-        border-bottom-left-radius: 6px;
         padding: 2rem;
         box-shadow: 0 12px 35px rgba(30, 41, 59, 0.08);
         position: relative;
@@ -139,14 +138,6 @@ st.markdown("""
     }
     .chat-bubble:hover {
         transform: translateY(-2px);
-    }
-    .chat-bubble::before {
-        content: '';
-        position: absolute;
-        bottom: -2px; left: -22px;
-        border-width: 22px 22px 0 0;
-        border-style: solid;
-        border-color: rgba(255,255,255,0.9) transparent transparent transparent;
     }
     .chat-bubble h3 { color: #0F172A !important; margin: 0 0 0.5rem 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; }
     .chat-bubble p  { color: #475569 !important; margin: 0 !important; font-size: 1.05rem !important; line-height: 1.6 !important; font-weight: 500; }
