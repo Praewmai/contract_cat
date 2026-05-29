@@ -587,11 +587,12 @@ CRITICAL RULES:
    - has_surcharge=true
    - surcharge_rates = per-room weekend supplement dict e.g. {{"room_id_1": 1500, "room_id_2": 3000}}
    - If same surcharge for all rooms use surcharge_amount (single value) instead
+   - Extract the exact weekend days stated in the PDF (e.g., "Friday & Saturday", "Saturday") into `weekend_days`. Extract the remaining weekday string into `weekday_days` (e.g., "Sun-Thu", "Sun-Fri").
 4. HTML FORMATTING PATTERNS (STRICT):
    Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
-   - child_policy:
+   - child_policy: (Do NOT include any food/meal-related information here)
      <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
-     <p>Child [Age] years old Sharing bed + ABF = [Price/FOC]</p>
+     <p>Child [Age] years old Sharing bed = [Price/FOC]</p>
      <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
    - cancellation_policy:
      <p><strong>Cancellation: [Season/Condition]</strong></p>
@@ -599,11 +600,11 @@ CRITICAL RULES:
      <p><strong>No Show & Early Check-Out:</strong></p>
      <p>• The equivalent of the full originally booked length of stay will be charged.</p>
    - meals_and_info:
-     <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong></p>
+     <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong> (Date format strictly e.g., 1 MAY 26 - 31 JUN 26, NOT 1/5/26)</p>
      <p><strong>• Minimum [X] Nights stay required on </strong>[DATES]</p>
      <p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Details]</p>
      <p><strong>• SUPPLEMENT CHARGE</strong> [Details]</p>
-     <p><span style="color: #ff0000;"><strong>Remark:</strong></span> [Details]</p>
+     <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
 5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
 6. Early Bird: promo_book_till = null UNLESS PDF clearly states a "book by" deadline.
 7. net_price = integer only (no decimals, no commas).
@@ -641,6 +642,8 @@ Return ONLY valid JSON (no markdown fences, no explanation):
       "cutoff_date": null,
       "room_allotment": null,
       "has_weekday_weekend": false,
+      "weekday_days": "Sun-Fri",
+      "weekend_days": "Saturday",
       "rates": {{"room_id_here": 0}},
       "early_bird_tiers": [
         {{"days": 60, "discount_pct": 15, "promo_code": "E.B 60 DAYS", "promo_book_till": null}}
