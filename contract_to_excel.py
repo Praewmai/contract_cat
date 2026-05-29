@@ -263,6 +263,8 @@ def generate_rows(parsed, selected_cts):
                     promo_code='POR Rate'
                 ))
 
+    # Custom sort strictly matching the example format (by start_date, then room_name)
+    rows.sort(key=lambda r: (r.get('start_date', ''), r.get('room_name', '')))
     return rows
 
 

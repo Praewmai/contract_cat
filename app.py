@@ -579,22 +579,37 @@ CONTRACT TYPES TO EXTRACT: {ct_desc}
 PROPERTY TYPE: {prop_type}
 
 CRITICAL RULES:
-1. Extract ONE period per distinct date range. Split periods if surcharge/blackout/min-nights rules differ.
-2. WEEKDAY/WEEKEND RATES:
+1. TRANSLATE EVERYTHING TO ENGLISH. All output must be in English, regardless of the original PDF language.
+2. Extract ONE period per distinct date range. Split periods if surcharge/blackout/min-nights rules differ.
+3. WEEKDAY/WEEKEND RATES:
    - Set has_weekday_weekend=true
    - rates dict = BASE (weekday) rate per room
    - has_surcharge=true
    - surcharge_rates = per-room weekend supplement dict e.g. {{"room_id_1": 1500, "room_id_2": 3000}}
    - If same surcharge for all rooms use surcharge_amount (single value) instead
-3. ALL HTML fields must use real HTML: <p>, <strong>, <span style="color:#ff0000;">
-4. meals_and_info = full HTML: contract name, validity, surcharges, meal rates, blackout dates, min nights, all key notes.
-5. cancellation_policy and child_policy = full HTML extracted from PDF.
-6. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
-7. Early Bird: promo_book_till = null UNLESS PDF clearly states a "book by" deadline.
-8. net_price = integer only (no decimals, no commas).
-9. rates dict key = room_id string EXACTLY as given in ROOMS above.
-10. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
-11. hotel_id = "{hotel_id}", hotel_supplier = "{supplier}"
+4. HTML FORMATTING PATTERNS (STRICT):
+   Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
+   - child_policy:
+     <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
+     <p>Child [Age] years old Sharing bed + ABF = [Price/FOC]</p>
+     <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
+   - cancellation_policy:
+     <p><strong>Cancellation: [Season/Condition]</strong></p>
+     <p>• Cancellation up to [X] days prior to arrival date, No charge.</p>
+     <p><strong>No Show & Early Check-Out:</strong></p>
+     <p>• The equivalent of the full originally booked length of stay will be charged.</p>
+   - meals_and_info:
+     <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong></p>
+     <p><strong>• Minimum [X] Nights stay required on </strong>[DATES]</p>
+     <p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Details]</p>
+     <p><strong>• SUPPLEMENT CHARGE</strong> [Details]</p>
+     <p><span style="color: #ff0000;"><strong>Remark:</strong></span> [Details]</p>
+5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
+6. Early Bird: promo_book_till = null UNLESS PDF clearly states a "book by" deadline.
+7. net_price = integer only (no decimals, no commas).
+8. rates dict key = room_id string EXACTLY as given in ROOMS above.
+9. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
+10. hotel_id = "{hotel_id}", hotel_supplier = "{supplier}"
 
 Return ONLY valid JSON (no markdown fences, no explanation):
 {{
