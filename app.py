@@ -591,25 +591,30 @@ CRITICAL RULES:
    - If there is a surcharge (weekend, gala dinner, peak season, etc.), extract the exact reason/note into `surcharge_note` (e.g. "Room rate include surcharge on Christmas Eve").
 4. HTML FORMATTING PATTERNS (STRICT):
    Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
-   - child_policy: (Do NOT include any food/meal-related information here)
+   - child_policy: (Do NOT include any food/meal-related information here. Split by room using `child_policies` dict)
      <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
      <p>Child [Age] years old Sharing bed = [Price/FOC]</p>
      <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
-   - cancellation_policy:
+   - cancellation_policy: (Split by period in the periods list)
      <p><strong>Cancellation: [Season/Condition]</strong></p>
      <p>• Cancellation up to [X] days prior to arrival date, No charge.</p>
      <p><strong>No Show & Early Check-Out:</strong></p>
      <p>• The equivalent of the full originally booked length of stay will be charged.</p>
    - meals_and_info:
-     <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong> (Date format strictly e.g., 1 MAY 26 - 31 JUN 26, NOT 1/5/26)</p>
-     <p><strong>• Minimum [X] Nights stay required on </strong>[DATES]</p>
+     <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong> (Date format strictly e.g., 1 MAY 26 - 31 JUN 26)</p>
+     <p><strong>※ MEAL PLAN</strong></p>
+     <p>• [Details...]</p>
+     <p><strong>※ MINIMUM NIGHTS & BLACKOUT DATES</strong></p>
+     <p>• Minimum [X] Nights stay required on [DATES]</p>
      <p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Details]</p>
-     <p><strong>• SUPPLEMENT CHARGE</strong> [Details]</p>
+     <p><strong>※ SUPPLEMENT CHARGE</strong> [Details]</p>
      <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
 5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
-6. Early Bird: promo_book_till = null UNLESS PDF clearly states a "book by" deadline.
-7. net_price = integer only (no decimals, no commas).
-8. rates dict key = room_id string EXACTLY as given in ROOMS above.
+6. cutoff_date: Extract ONLY the integer number of days (e.g., 14). Do not calculate actual calendar dates.
+7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {"room_id_1": 2, "room_id_2": 3}).
+8. period_promo_note: Add any period-specific conditions (e.g. MIN. 3 NIGHTS, Compulsory dinner, Not allowed to check out) to this field inside the period.
+9. net_price = integer only (no decimals, no commas).
+10. rates dict key = room_id string EXACTLY as given in ROOMS above.
 9. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
 10. hotel_id = "{hotel_id}", hotel_supplier = "{supplier}"
 
@@ -618,9 +623,9 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   "hotel_id": "{hotel_id}",
   "hotel_supplier": "{supplier}",
   "abf": "Included",
-  "cancellation_policy": "<p><strong>CANCELLATION:</strong></p><p>...</p>",
-  "child_policy": "<p><span style=\\"color:#008000;\\"><strong>Maximum Occupancy: 2A+1C</strong></span></p><p>Child 0-6.99 years: FOC</p>",
-  "meals_and_info": "<p><strong>CONTRACT NAME : VALIDITY DATES</strong></p><p>Notes...</p>",
+  "child_policy": null,
+  "child_policies": {{"room_id_here": "<p>...</p>"}},
+  "meals_and_info": "<p><strong>MAIN CONTRACT...</strong></p>",
   "child_share_bed_abf": null,
   "child_extra_bed_abf": null,
   "extra_bed_abf": null,
@@ -640,9 +645,11 @@ Return ONLY valid JSON (no markdown fences, no explanation):
       "surcharge_rates": {{}},
       "surcharge_currency": "THB",
       "surcharge_note": null,
+      "period_promo_note": null,
+      "cancellation_policy": "<p>...</p>",
       "min_nights_stay": null,
-      "cutoff_date": null,
-      "room_allotment": null,
+      "cutoff_date": 14,
+      "room_allotment": {{"room_id_here": 2}},
       "has_weekday_weekend": false,
       "weekday_days": "Sun-Fri",
       "weekend_days": "Saturday",

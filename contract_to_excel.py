@@ -71,6 +71,16 @@ def _base_row(parsed, room, period, net_price, contract_type,
     if isinstance(allotment, dict):
         allotment = allotment.get(room['room_id'])
         
+    cxl_policy = period.get('cancellation_policy') or parsed.get('cancellation_policy') or None
+    child_pol = parsed.get('child_policies', {}).get(room['room_id']) or parsed.get('child_policy') or None
+    
+    period_note = period.get('period_promo_note')
+    if period_note:
+        if promo_note:
+            promo_note += f'<p><strong>{period_note}</strong></p>'
+        else:
+            promo_note = f'<p><strong>{period_note}</strong></p>'
+        
     return {
         '_id':                    None,
         'hotel_id':               parsed['hotel_id'],
@@ -97,10 +107,10 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'promo_note':             promo_note,
         'all_inclusive':          None,
         'baby_cot':               None,
-        'cancellation_policy':    parsed.get('cancellation_policy') or None,
+        'cancellation_policy':    cxl_policy,
         'cancellation_policy_net':None,
         'early_check_in':         None,
-        'child_policy':           parsed.get('child_policy') or None,
+        'child_policy':           child_pol,
         'child_share_bed_abf':    parsed.get('child_share_bed_abf'),
         'child_extra_bed_abf':    parsed.get('child_extra_bed_abf'),
         'extra_bed_abf':          parsed.get('extra_bed_abf'),
