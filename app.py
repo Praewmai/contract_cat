@@ -31,267 +31,292 @@ else:
 # ─── CSS ───
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Outfit', sans-serif !important;
     }
 
     /* ── Background ── */
     .stApp {
-        background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%) !important;
+        background: radial-gradient(circle at top left, #F8FAFC 0%, #E2E8F0 100%) !important;
         min-height: 100vh;
     }
 
     /* ── Sidebar ── */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%) !important;
-        border-right: 1px solid rgba(255,255,255,0.05) !important;
+        background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%) !important;
+        border-right: 1px solid rgba(255,255,255,0.08) !important;
     }
-    [data-testid="stSidebar"] * { color: #CBD5E1 !important; }
-    [data-testid="stSidebar"] h4 { color: #94A3B8 !important; font-size: 0.75rem !important; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1rem !important; }
-    [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.1) !important; }
+    [data-testid="stSidebar"] * { color: #E2E8F0 !important; }
+    [data-testid="stSidebar"] h4 { color: #94A3B8 !important; font-size: 0.8rem !important; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1rem !important; font-weight: 700; }
+    [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.1) !important; margin: 1.5rem 0 !important; }
     [data-testid="stSidebar"] .stTextInput > div > div > input {
-        background: rgba(255,255,255,0.07) !important;
-        border: 1px solid rgba(255,255,255,0.15) !important;
-        color: #E2E8F0 !important;
-        border-radius: 8px !important;
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: #F8FAFC !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1rem !important;
+        transition: all 0.3s ease;
     }
-    [data-testid="stSidebar"] .stRadio label span { color: #CBD5E1 !important; }
+    [data-testid="stSidebar"] .stTextInput > div > div > input:focus {
+        background: rgba(255,255,255,0.1) !important;
+        border-color: #94A3B8 !important;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.05) !important;
+    }
 
     /* ── Mascot ── */
     .mascot-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 1.2rem 0 0.5rem 0;
+        padding: 1.5rem 0 1rem 0;
     }
     .mascot-avatar {
-        width: 120px;
-        height: 120px;
+        width: 140px;
+        height: 140px;
         object-fit: contain;
-        filter: drop-shadow(0 4px 15px rgba(0,0,0,0.15));
+        filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+        animation: float-mascot 4s ease-in-out infinite;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .mascot-avatar:hover {
+        transform: scale(1.1) rotate(2deg);
+    }
+    @keyframes float-mascot {
+        0%   { transform: translateY(0px); }
+        50%  { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+    }
+
     .sidebar-title {
         text-align: center;
-        font-size: 1.4rem !important;
+        font-size: 1.6rem !important;
         font-weight: 800 !important;
-        color: #F1F5F9 !important;
-        margin: 0.3rem 0 0.1rem 0 !important;
+        background: linear-gradient(90deg, #F8FAFC, #94A3B8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0.2rem 0 0.1rem 0 !important;
     }
     .sidebar-subtitle {
         text-align: center;
-        font-size: 0.78rem !important;
-        color: #64748B !important;
+        font-size: 0.8rem !important;
+        color: #94A3B8 !important;
         margin: 0 !important;
-        letter-spacing: 1px;
+        letter-spacing: 1.5px;
         text-transform: uppercase;
+        font-weight: 600;
     }
     .sidebar-pill {
-        background: linear-gradient(135deg, #334155, #475569);
-        border-radius: 10px;
-        padding: 0.5rem 1rem;
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 0.6rem 1rem;
         text-align: center;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #E2E8F0 !important;
-        margin: 0.8rem 0;
+        margin: 1.2rem 0;
         border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        font-weight: 500;
     }
 
     /* ── Chat Bubble ── */
     .chat-bubble {
-        background: #FFFFFF;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-radius: 24px;
-        border-bottom-left-radius: 4px;
-        padding: 1.8rem 2rem;
-        box-shadow: 0 10px 30px rgba(100,116,139,0.1);
+        border-bottom-left-radius: 6px;
+        padding: 2rem;
+        box-shadow: 0 12px 35px rgba(30, 41, 59, 0.08);
         position: relative;
-        margin-bottom: 1.5rem;
-        border: 2px solid #E2E8F0;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255,255,255,1);
         display: flex;
         align-items: center;
-        gap: 1.5rem;
+        gap: 1.8rem;
+        transition: transform 0.3s;
+    }
+    .chat-bubble:hover {
+        transform: translateY(-2px);
     }
     .chat-bubble::before {
         content: '';
         position: absolute;
-        bottom: -2px; left: -20px;
-        border-width: 20px 20px 0 0;
+        bottom: -2px; left: -22px;
+        border-width: 22px 22px 0 0;
         border-style: solid;
-        border-color: #E2E8F0 transparent transparent transparent;
+        border-color: rgba(255,255,255,0.9) transparent transparent transparent;
     }
-    .chat-bubble::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: -16px;
-        border-width: 17px 17px 0 0;
-        border-style: solid;
-        border-color: #FFFFFF transparent transparent transparent;
+    .chat-bubble h3 { color: #0F172A !important; margin: 0 0 0.5rem 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; }
+    .chat-bubble p  { color: #475569 !important; margin: 0 !important; font-size: 1.05rem !important; line-height: 1.6 !important; font-weight: 500; }
+
+    /* ── Step Cards ── */
+    .step-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.8);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(30, 41, 59, 0.04);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .chat-bubble h3 { color: #1E293B !important; margin: 0 0 0.4rem 0 !important; font-size: 1.5rem !important; font-weight: 800 !important; }
-    .chat-bubble p  { color: #475569 !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.6 !important; }
+    .step-card:hover { 
+        box-shadow: 0 12px 30px rgba(30, 41, 59, 0.08); 
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.9);
+    }
+    .step-title {
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #334155;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .step-num {
+        background: linear-gradient(135deg, #1E293B, #334155);
+        color: #fff;
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        box-shadow: 0 4px 10px rgba(30,41,59,0.2);
+    }
 
     /* ── Output Badge ── */
     .output-badge {
-        background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
-        border-radius: 16px;
-        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        border-radius: 18px;
+        padding: 1.2rem 1.5rem;
         margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
         gap: 1.2rem;
         color: #fff;
-        box-shadow: 0 8px 25px rgba(30,41,59,0.25);
+        box-shadow: 0 10px 30px rgba(15,23,42,0.3);
+        transition: transform 0.3s;
     }
-    .output-badge h4 { margin: 0; font-size: 1rem; font-weight: 700; color: #fff; }
-    .output-badge p  { margin: 0; font-size: 0.8rem; opacity: 0.7; color: #fff; }
+    .output-badge:hover { transform: translateY(-2px); }
+    .output-badge h4 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .output-badge p  { margin: 0; font-size: 0.85rem; opacity: 0.8; color: #fff; }
     .output-stat {
-        background: rgba(255,255,255,0.12);
-        border-radius: 10px;
-        padding: 8px 16px;
-        font-size: 1.5rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-size: 1.6rem;
         font-weight: 800;
         text-align: center;
-        min-width: 70px;
-        flex-shrink: 0;
+        min-width: 75px;
+        border: 1px solid rgba(255,255,255,0.1);
     }
-    .output-stat span { display: block; font-size: 0.62rem; font-weight: 500; opacity: 0.75; margin-top: 2px; }
-
-    /* ── Step Cards ── */
-    .step-card {
-        background: #FFFFFF;
-        border-radius: 16px;
-        border: 2px solid #E2E8F0;
-        padding: 1.2rem 1.4rem 0.8rem 1.4rem;
-        margin-bottom: 0.8rem;
-        box-shadow: 0 4px 12px rgba(100,116,139,0.07);
-        transition: box-shadow 0.25s;
-    }
-    .step-card:hover { box-shadow: 0 8px 24px rgba(100,116,139,0.13); }
-    .step-title {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1.8px;
-        color: #64748B;
-        margin-bottom: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .step-num {
-        background: linear-gradient(135deg, #64748B, #475569);
-        color: #fff;
-        width: 22px; height: 22px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.72rem;
-        font-weight: 800;
-        flex-shrink: 0;
-    }
+    .output-stat span { display: block; font-size: 0.65rem; font-weight: 600; opacity: 0.8; margin-top: 2px; text-transform: uppercase; }
 
     /* ── Room Table Header ── */
     .room-header {
         display: grid;
         grid-template-columns: 1fr 100px 32px;
         gap: 8px;
-        padding: 4px 4px 6px 4px;
-        font-size: 0.68rem;
-        font-weight: 700;
+        padding: 4px 4px 8px 4px;
+        font-size: 0.7rem;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 1.2px;
-        color: #94A3B8;
-        border-bottom: 2px solid #E2E8F0;
-        margin-bottom: 2px;
+        color: #64748B;
+        border-bottom: 2px solid rgba(30,41,59,0.1);
+        margin-bottom: 6px;
     }
 
     /* ── Summary Badges ── */
     .ct-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 0.8rem;
+        gap: 10px;
+        margin-bottom: 1rem;
     }
     .ct-badge {
-        background: #F1F5F9;
-        border: 1.5px solid #CBD5E1;
+        background: #F8FAFC;
+        border: 1px solid #CBD5E1;
         border-radius: 20px;
-        padding: 4px 14px;
-        font-size: 0.78rem;
-        font-weight: 600;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+        font-weight: 700;
         color: #475569;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
     .ct-badge-active {
-        background: #1E293B;
-        border-color: #1E293B;
+        background: #0F172A;
+        border-color: #0F172A;
         color: #fff;
+        box-shadow: 0 4px 10px rgba(15,23,42,0.2);
     }
 
     /* ── Inputs ── */
     .stTextInput > div > div > input {
-        border-radius: 10px !important;
-        border: 2px solid #E2E8F0 !important;
-        padding: 0.6rem 1rem !important;
-        background-color: #F8FAFC !important;
-        color: #334155 !important;
+        border-radius: 12px !important;
+        border: 1px solid #CBD5E1 !important;
+        padding: 0.7rem 1.2rem !important;
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
         font-weight: 500;
-        transition: all 0.25s;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #94A3B8 !important;
-        box-shadow: 0 0 0 3px rgba(148,163,184,0.15) !important;
-        background-color: #FFFFFF !important;
+        border-color: #6366F1 !important;
+        box-shadow: 0 0 0 4px rgba(99,102,241,0.15) !important;
     }
 
     /* ── Checkbox ── */
-    [data-testid="stCheckbox"] label span { color: #475569 !important; font-weight: 500 !important; }
+    [data-testid="stCheckbox"] label span { color: #334155 !important; font-weight: 600 !important; }
     [data-testid="stCheckbox"] label { white-space: nowrap !important; }
 
     /* ── Main Button ── */
     div[data-testid="stButton"] > button {
-        background: linear-gradient(135deg, #1E293B 0%, #334155 100%) !important;
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
         color: #FFFFFF !important;
         border: none !important;
-        border-radius: 14px !important;
-        padding: 0.85rem 2rem !important;
-        font-weight: 700 !important;
-        font-size: 1.05rem !important;
+        border-radius: 16px !important;
+        padding: 0.9rem 2rem !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
         width: 100%;
-        box-shadow: 0 6px 20px rgba(30,41,59,0.3) !important;
-        transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
-        letter-spacing: 0.3px;
+        box-shadow: 0 8px 25px rgba(15,23,42,0.3) !important;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        letter-spacing: 0.5px;
     }
     div[data-testid="stButton"] > button:hover {
-        transform: translateY(-2px) scale(1.01) !important;
-        box-shadow: 0 12px 28px rgba(30,41,59,0.4) !important;
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0 15px 35px rgba(15,23,42,0.4) !important;
+        background: linear-gradient(135deg, #1E293B 0%, #334155 100%) !important;
     }
 
     /* ── Download Button ── */
     div[data-testid="stDownloadButton"] > button {
-        background: linear-gradient(135deg, #16A34A 0%, #15803D 100%) !important;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
         color: #FFFFFF !important;
         border: none !important;
-        border-radius: 14px !important;
-        padding: 0.85rem 2rem !important;
-        font-weight: 700 !important;
-        font-size: 1.05rem !important;
+        border-radius: 16px !important;
+        padding: 0.9rem 2rem !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
         width: 100%;
-        box-shadow: 0 6px 20px rgba(22,163,74,0.3) !important;
-        transition: all 0.3s !important;
+        box-shadow: 0 8px 25px rgba(16,185,129,0.3) !important;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     }
     div[data-testid="stDownloadButton"] > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 12px 28px rgba(22,163,74,0.4) !important;
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0 15px 35px rgba(16,185,129,0.4) !important;
     }
 
-    /* ── Float animation ── */
-    @keyframes float {
-        0%   { transform: translateY(0px); }
-        50%  { transform: translateY(-8px); }
-        100% { transform: translateY(0px); }
-    }
 </style>
 """, unsafe_allow_html=True)
 
