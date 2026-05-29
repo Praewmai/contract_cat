@@ -66,6 +66,11 @@ def _base_row(parsed, room, period, net_price, contract_type,
               promo_code=None, min_advance_days=None, min_nights_stay=None,
               promo_note=None, promo_book_till=None):
     """Build a single dashboard row dict."""
+    
+    allotment = period.get('room_allotment')
+    if isinstance(allotment, dict):
+        allotment = allotment.get(room['room_id'])
+        
     return {
         '_id':                    None,
         'hotel_id':               parsed['hotel_id'],
@@ -90,7 +95,6 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'promo_book_till':        promo_book_till,
         'promo_code':             promo_code,
         'promo_note':             promo_note,
-        'room_allotment':         period.get('room_allotment'),
         'all_inclusive':          None,
         'baby_cot':               None,
         'cancellation_policy':    parsed.get('cancellation_policy') or None,
@@ -108,6 +112,7 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'hotel_transfer':         None,
         'late_check_out':         None,
         'meals_and_info':         parsed.get('meals_and_info') or None,
+        'room_allotment':         allotment,
         'tags':                   '[]',
         'action':                 'insert',
     }
@@ -304,6 +309,9 @@ def write_excel(rows, output_path):
     for r_idx, row in enumerate(rows, 2):
         for c_idx, h in enumerate(HEADERS, 1):
             val  = row.get(h)
+            if isinstance(val, (dict, list)):
+                import json
+                val = json.dumps(val)
             cell = ws.cell(r_idx, c_idx, val)
             cell.font = data_font
 
