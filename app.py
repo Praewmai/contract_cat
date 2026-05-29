@@ -339,7 +339,39 @@ with st.sidebar:
 """, unsafe_allow_html=True)
 
     st.markdown("#### 🔑 Gemini API Key")
-    api_key = st.text_input("API Key", type="password", placeholder="AIza...", label_visibility="collapsed")
+    
+    import json
+    import os
+    
+    KEYS_FILE = "user_keys.json"
+    client_ip = "unknown"
+    try:
+        if hasattr(st, "context") and hasattr(st.context, "ip_address"):
+            client_ip = st.context.ip_address or "unknown"
+    except Exception:
+        pass
+        
+    saved_key = ""
+    if os.path.exists(KEYS_FILE):
+        try:
+            with open(KEYS_FILE, "r") as f:
+                saved_key = json.load(f).get(client_ip, "")
+        except Exception:
+            pass
+
+    api_key = st.text_input("API Key", value=saved_key, type="password", placeholder="AIza...", label_visibility="collapsed")
+    
+    if api_key and api_key != saved_key:
+        try:
+            saved_keys = {}
+            if os.path.exists(KEYS_FILE):
+                with open(KEYS_FILE, "r") as f:
+                    saved_keys = json.load(f)
+            saved_keys[client_ip] = api_key
+            with open(KEYS_FILE, "w") as f:
+                json.dump(saved_keys, f)
+        except Exception:
+            pass
 
     st.markdown("---")
     st.markdown("#### 🏨 Property Info")
