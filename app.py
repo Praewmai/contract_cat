@@ -600,6 +600,7 @@ CRITICAL RULES:
      <p>• Cancellation up to [X] days prior to arrival date, No charge.</p>
      <p><strong>No Show & Early Check-Out:</strong></p>
      <p>• The equivalent of the full originally booked length of stay will be charged.</p>
+     (If strictly non-refundable, use: <p><span style="color:#f44336;"><strong>NON-REFUNDABLE</strong></span></p>)
    - meals_and_info:
      <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong> (Date format strictly e.g., 1 MAY 26 - 31 JUN 26)</p>
      <p><strong>※ MEAL PLAN</strong></p>
