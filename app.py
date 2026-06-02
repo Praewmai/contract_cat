@@ -553,8 +553,43 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
     if not ready:
         st.warning("⚠️ กรุณากรอกข้อมูลให้ครบก่อนนะเหมียว!")
     else:
-        with st.spinner("🐱 น้องแมวกำลังอ่าน contract อยู่นะ… รอสักครู่ (ไม่เกิน 60 วินาที)"):
-            try:
+        loading_overlay = st.empty()
+        loading_overlay.markdown("""
+        <style>
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.85); z-index: 999999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .cat-spinner {
+            font-size: 4rem;
+            animation: bounce 1s infinite alternate;
+        }
+        .loading-bar-container {
+            width: 300px; height: 10px; background: rgba(255,255,255,0.2);
+            border-radius: 10px; margin-top: 20px; overflow: hidden;
+        }
+        .loading-bar {
+            width: 50%; height: 100%; background: #6366F1;
+            border-radius: 10px;
+            animation: slide 1.5s infinite ease-in-out alternate;
+        }
+        .loading-text {
+            color: #FFFFFF; font-size: 1.2rem; margin-top: 15px; font-weight: 600; letter-spacing: 1px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+        @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        </style>
+        <div class="loading-overlay">
+            <div class="cat-spinner">🐱</div>
+            <div class="loading-bar-container"><div class="loading-bar"></div></div>
+            <div class="loading-text">กำลังแกะข้อมูล Contract... รอสักครู่นะเหมียว!</div>
+        </div>
+        """, unsafe_allow_html=True)
+        try:
                 file_bytes = uploaded_file.read()
                 b64_data   = base64.b64encode(file_bytes).decode("utf-8")
 
@@ -620,11 +655,14 @@ CRITICAL RULES:
      <p>• [Details of Early bird or special offers...]</p>
      <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
 5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
-6. cutoff_date: MUST be a pure integer representing the number of days (e.g., 14). Do NOT output a calendar date string. If a calendar date is given, convert it to days prior to arrival.
+6. cutoff_date: Extract ONLY the raw number provided in the PDF (e.g., if "14 Days", output 14). Do NOT output a date.
 7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {{"room_id_1": 2, "room_id_2": 3}}).
 8. period_promo_note: Add any period-specific conditions (e.g. MIN. 3 NIGHTS, Compulsory dinner, Not allowed to check out) to this field inside the period.
-9. net_price = integer only (no decimals, no commas).
+9. net_price, extra beds, and meals: output as integers ONLY (no decimals, no commas).
+   - child_share_bed_abf, child_extra_bed_abf, extra_bed_abf, extra_bed_no_abf, full_board, half_board: Extract the prices as integer.
 10. rates dict key = room_id string EXACTLY as given in ROOMS above.
+11. PROMOTIONS: If the PDF explicitly gives promotion codes (e.g. "SUMMER26"), extract them into the `promotions` list. Calculate the discounted `rates` for each room and apply any extra bed/meal discounts if specified.
+12. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
 9. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
 10. hotel_id = "{hotel_id}", hotel_supplier = "{supplier}"
 
@@ -643,6 +681,23 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   "full_board": null,
   "half_board": null,
   "rooms": {json.dumps(valid_rooms)},
+  "promotions": [
+    {{
+      "promo_code": "PROMO26",
+      "start_date": "YYYY-MM-DD",
+      "end_date": "YYYY-MM-DD",
+      "promo_note": null,
+      "min_advance_days": null,
+      "min_nights_stay": null,
+      "rates": {{"room_id_here": 0}},
+      "child_share_bed_abf": null,
+      "child_extra_bed_abf": null,
+      "extra_bed_abf": null,
+      "extra_bed_no_abf": null,
+      "full_board": null,
+      "half_board": null
+    }}
+  ],
   "periods": [
     {{
       "start_date": "YYYY-MM-DD",
@@ -771,3 +826,5 @@ Return ONLY valid JSON (no markdown fences, no explanation):
                 st.error(f"❌ เกิดข้อผิดพลาด: {str(e)}")
                 import traceback
                 st.code(traceback.format_exc())
+            finally:
+                loading_overlay.empty()
