@@ -352,7 +352,13 @@ with st.sidebar:
         pass
         
     saved_key = ""
-    if os.path.exists(KEYS_FILE):
+    try:
+        if "GEMINI_API_KEY" in st.secrets:
+            saved_key = st.secrets["GEMINI_API_KEY"]
+    except Exception:
+        pass
+
+    if not saved_key and os.path.exists(KEYS_FILE):
         try:
             with open(KEYS_FILE, "r") as f:
                 saved_key = json.load(f).get(client_ip, "")
@@ -593,7 +599,8 @@ CRITICAL RULES:
    Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
    - child_policy: (Do NOT include any food/meal-related information here. Split by room using `child_policies` dict)
      <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
-     <p>Child [Age] years old Sharing bed = [Price/FOC]</p>
+     <p>Child [Age] years old Sharing bed + ABF = [Price/FOC]</p>
+     <p>Child/Adult Extra bed + ABF = [Price]</p>
      <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
    - cancellation_policy: (Split by period in the periods list)
      <p><strong>Cancellation: [Season/Condition]</strong></p>
@@ -609,9 +616,11 @@ CRITICAL RULES:
      <p>• Minimum [X] Nights stay required on [DATES]</p>
      <p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Details]</p>
      <p><strong>※ SUPPLEMENT CHARGE</strong> [Details]</p>
+     <p><strong>※ EARLY BIRD & SPECIAL OFFERS</strong></p>
+     <p>• [Details of Early bird or special offers...]</p>
      <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
 5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
-6. cutoff_date: Extract ONLY the integer number of days (e.g., 14). Do not calculate actual calendar dates.
+6. cutoff_date: MUST be a pure integer representing the number of days (e.g., 14). Do NOT output a calendar date string. If a calendar date is given, convert it to days prior to arrival.
 7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {{"room_id_1": 2, "room_id_2": 3}}).
 8. period_promo_note: Add any period-specific conditions (e.g. MIN. 3 NIGHTS, Compulsory dinner, Not allowed to check out) to this field inside the period.
 9. net_price = integer only (no decimals, no commas).

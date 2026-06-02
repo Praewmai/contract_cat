@@ -69,10 +69,10 @@ def _base_row(parsed, room, period, net_price, contract_type,
     
     allotment = period.get('room_allotment')
     if isinstance(allotment, dict):
-        allotment = allotment.get(room['room_id'])
+        allotment = allotment.get(str(room['room_id'])) or allotment.get(room['room_id'])
         
     cxl_policy = period.get('cancellation_policy') or parsed.get('cancellation_policy') or None
-    child_pol = parsed.get('child_policies', {}).get(room['room_id']) or parsed.get('child_policy') or None
+    child_pol = parsed.get('child_policies', {}).get(str(room['room_id'])) or parsed.get('child_policies', {}).get(room['room_id']) or parsed.get('child_policy') or None
     
     period_note = period.get('period_promo_note')
     if period_note:
