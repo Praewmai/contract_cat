@@ -21,6 +21,22 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 from datetime import datetime
 import math
+import json
+import re
+
+
+def _clean_int(val):
+    if val is None:
+        return None
+    cleaned = re.sub(r'[^0-9]', '', str(val))
+    return int(cleaned) if cleaned else None
+
+
+def _get_price(source_dict, key, default_dict):
+    val = source_dict.get(key) if source_dict else None
+    if val is None:
+        val = default_dict.get(key)
+    return _clean_int(val)
 
 
 # ─────────────────────────────────────────────
@@ -64,7 +80,7 @@ COL_WIDTHS = {
 
 def _base_row(parsed, room, period, net_price, contract_type,
               promo_code=None, min_advance_days=None, min_nights_stay=None,
-              promo_note=None, promo_book_till=None, room_index=0):
+              promo_note=None, promo_book_till=None, room_index=0, promo_source=None):
     """Build a single dashboard row dict."""
     
     allotment = period.get('room_allotment')
@@ -73,6 +89,8 @@ def _base_row(parsed, room, period, net_price, contract_type,
         
     cxl_policy = period.get('cancellation_policy') or parsed.get('cancellation_policy') or None
     child_pol = parsed.get('child_policies', {}).get(str(room['room_id'])) or parsed.get('child_policies', {}).get(room['room_id']) or parsed.get('child_policy') or None
+    
+    cutoff_val = _clean_int(period.get('cutoff_date'))
     
     period_note = period.get('period_promo_note')
     if period_note:
@@ -93,7 +111,7 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'refundable':             False,
         'abf':                    parsed.get('abf', 'Included'),
         'contract_type':          contract_type,
-        'cutoff_date':            period.get('cutoff_date'),
+        'cutoff_date':            cutoff_val,
         'hotel_supplier':         parsed['hotel_supplier'],
         'important_message':      None,
         'min_nights_stay':        min_nights_stay or period.get('min_nights_stay'),
@@ -111,12 +129,12 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'cancellation_policy_net':None,
         'early_check_in':         None,
         'child_policy':           child_pol,
-        'child_share_bed_abf':    parsed.get('child_share_bed_abf'),
-        'child_extra_bed_abf':    parsed.get('child_extra_bed_abf'),
-        'extra_bed_abf':          parsed.get('extra_bed_abf'),
-        'extra_bed_no_abf':       parsed.get('extra_bed_no_abf'),
-        'full_board':             parsed.get('full_board'),
-        'half_board':             parsed.get('half_board'),
+        'child_share_bed_abf':    _get_price(promo_source, 'child_share_bed_abf', parsed),
+        'child_extra_bed_abf':    _get_price(promo_source, 'child_extra_bed_abf', parsed),
+        'extra_bed_abf':          _get_price(promo_source, 'extra_bed_abf', parsed),
+        'extra_bed_no_abf':       _get_price(promo_source, 'extra_bed_no_abf', parsed),
+        'full_board':             _get_price(promo_source, 'full_board', parsed),
+        'half_board':             _get_price(promo_source, 'half_board', parsed),
         'hotel_extra_fees':       None,
         'room_name':              room['room_name'],
         'hotel_transfer':         None,
@@ -245,12 +263,17 @@ def generate_rows(parsed, selected_cts):
             # ── PROMOTION ──────────────────────────────────
             if 'promo' in ct_types and not is_blackout:
                 promo_cfg  = ct_map.get('promo', {})
-                promotions = period.get('promotions', [])
+                # Look for promotions either in the period or globally
+                promotions = period.get('promotions') or parsed.get('promotions') or []
+                if not promotions:
+                    promotions = [{}] # fallback to one generic promo
 
                 for promo in promotions:
                     discount   = promo.get('discount_pct', 0)
-                    promo_rate = round(base_rate * (1 - discount / 100))
-                    promo_code = promo.get('promo_code') or promo_cfg.get('promo_code', '')
+                    promo_rate = promo.get('rates', {}).get(str(room['room_id']))
+                    if promo_rate is None:
+                        promo_rate = round(base_rate * (1 - discount / 100)) if discount else base_rate
+                    promo_code = promo.get('promo_code') or promo_cfg.get('promo_code', 'Promotion')
                     book_till  = promo.get('promo_book_till') or promo_cfg.get('promo_till')
 
                     if has_ww:
@@ -260,7 +283,8 @@ def generate_rows(parsed, selected_cts):
                             promo_code=f'{promo_code} - Weekday',
                             promo_book_till=book_till,
                             promo_note=_weekday_note(False, weekend_days, weekday_days),
-                            room_index=r_i
+                            room_index=r_i,
+                            promo_source=promo
                         ))
                         # Weekend promo row (per-room surcharge)
                         weekend_promo = promo_rate + room_surcharge if has_surcharge else promo_rate
@@ -272,7 +296,8 @@ def generate_rows(parsed, selected_cts):
                             promo_code=f'{promo_code} - Weekend',
                             promo_book_till=book_till,
                             promo_note=weekend_note,
-                            room_index=r_i
+                            room_index=r_i,
+                            promo_source=promo
                         ))
                     else:
                         note = _surcharge_note(surcharge_cur, room_surcharge, custom_surcharge_note) if has_surcharge else None
@@ -281,7 +306,8 @@ def generate_rows(parsed, selected_cts):
                             promo_code=promo_code,
                             promo_book_till=book_till,
                             promo_note=note,
-                            room_index=r_i
+                            room_index=r_i,
+                            promo_source=promo
                         ))
 
             # ── POR ────────────────────────────────────────
