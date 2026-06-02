@@ -64,7 +64,7 @@ COL_WIDTHS = {
 
 def _base_row(parsed, room, period, net_price, contract_type,
               promo_code=None, min_advance_days=None, min_nights_stay=None,
-              promo_note=None, promo_book_till=None):
+              promo_note=None, promo_book_till=None, room_index=0):
     """Build a single dashboard row dict."""
     
     allotment = period.get('room_allotment')
@@ -125,6 +125,7 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'room_allotment':         allotment,
         'tags':                   '[]',
         'action':                 'insert',
+        '_room_index':            room_index,
     }
 
 
@@ -176,7 +177,7 @@ def generate_rows(parsed, selected_cts):
         custom_surcharge_note = period.get('surcharge_note')
         eb_tiers      = period.get('early_bird_tiers', [])
 
-        for room in parsed.get('rooms', []):
+        for r_i, room in enumerate(parsed.get('rooms', [])):
             rid = room['room_id']
             base_rate = (period.get('rates') or {}).get(rid, 0) or 0
             # Use per-room surcharge if available, else fall back to period-level
@@ -189,7 +190,8 @@ def generate_rows(parsed, selected_cts):
                     rows.append(_base_row(
                         parsed, room, period, base_rate, 'Main Contract',
                         promo_code='Main - Weekday',
-                        promo_note=_weekday_note(False, weekend_days, weekday_days)
+                        promo_note=_weekday_note(False, weekend_days, weekday_days),
+                        room_index=r_i
                     ))
                     # Weekend row (base + per-room weekend surcharge)
                     weekend_rate = base_rate + room_surcharge if has_surcharge else base_rate
@@ -199,17 +201,19 @@ def generate_rows(parsed, selected_cts):
                     rows.append(_base_row(
                         parsed, room, period, weekend_rate, 'Main Contract',
                         promo_code='Main - Weekend',
-                        promo_note=weekend_note
+                        promo_note=weekend_note,
+                        room_index=r_i
                     ))
                 elif has_surcharge:
                     rows.append(_base_row(
                         parsed, room, period,
                         base_rate + room_surcharge, 'Main Contract',
-                        promo_note=_surcharge_note(surcharge_cur, room_surcharge, custom_surcharge_note)
+                        promo_note=_surcharge_note(surcharge_cur, room_surcharge, custom_surcharge_note),
+                        room_index=r_i
                     ))
                 else:
                     rows.append(_base_row(
-                        parsed, room, period, base_rate, 'Main Contract'
+                        parsed, room, period, base_rate, 'Main Contract', room_index=r_i
                     ))
 
             # ── EARLY BIRD ──────────────────────────────
@@ -234,7 +238,8 @@ def generate_rows(parsed, selected_cts):
                         promo_code=promo_code,
                         min_advance_days=days,
                         promo_note=note,
-                        promo_book_till=eb_book_till
+                        promo_book_till=eb_book_till,
+                        room_index=r_i
                     ))
 
             # ── PROMOTION ──────────────────────────────────
@@ -254,7 +259,8 @@ def generate_rows(parsed, selected_cts):
                             parsed, room, period, promo_rate, 'Promotion',
                             promo_code=f'{promo_code} - Weekday',
                             promo_book_till=book_till,
-                            promo_note=_weekday_note(False, weekend_days, weekday_days)
+                            promo_note=_weekday_note(False, weekend_days, weekday_days),
+                            room_index=r_i
                         ))
                         # Weekend promo row (per-room surcharge)
                         weekend_promo = promo_rate + room_surcharge if has_surcharge else promo_rate
@@ -265,7 +271,8 @@ def generate_rows(parsed, selected_cts):
                             parsed, room, period, weekend_promo, 'Promotion',
                             promo_code=f'{promo_code} - Weekend',
                             promo_book_till=book_till,
-                            promo_note=weekend_note
+                            promo_note=weekend_note,
+                            room_index=r_i
                         ))
                     else:
                         note = _surcharge_note(surcharge_cur, room_surcharge, custom_surcharge_note) if has_surcharge else None
@@ -273,18 +280,26 @@ def generate_rows(parsed, selected_cts):
                             parsed, room, period, promo_rate, 'Promotion',
                             promo_code=promo_code,
                             promo_book_till=book_till,
-                            promo_note=note
+                            promo_note=note,
+                            room_index=r_i
                         ))
 
             # ── POR ────────────────────────────────────────
             if 'por' in ct_types:
                 rows.append(_base_row(
                     parsed, room, period, 0, 'POR',
-                    promo_code='POR Rate'
+                    promo_code='POR Rate',
+                    room_index=r_i
                 ))
 
-    # Custom sort strictly matching the example format (by start_date, then room_name)
-    rows.sort(key=lambda r: (r.get('start_date', ''), r.get('room_name', '')))
+    # Custom sort strictly matching the example format
+    ct_order = {'Main Contract': 0, 'Early Bird': 1, 'Promotion': 2, 'POR': 3}
+    rows.sort(key=lambda r: (
+        r.get('start_date', ''),
+        ct_order.get(r.get('contract_type', ''), 99),
+        r.get('promo_code', '') or '',
+        r.get('_room_index', 0)
+    ))
     return rows
 
 
