@@ -590,60 +590,60 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
         </div>
         """, unsafe_allow_html=True)
         try:
-                file_bytes = uploaded_file.read()
-                b64_data   = base64.b64encode(file_bytes).decode("utf-8")
+            file_bytes = uploaded_file.read()
+            b64_data   = base64.b64encode(file_bytes).decode("utf-8")
 
-                ct_desc_parts = []
-                for c in cts:
-                    if c["type"] == "main":
-                        ct_desc_parts.append("Main Contract: extract all standard net rates per period.")
-                    elif c["type"] == "eb":
-                        ct_desc_parts.append(
-                            'Early Bird: detect ALL tiers from PDF automatically. '
-                            'For each tier, extract days_in_advance and discount_pct. '
-                            'promo_code = "E.B {days} DAYS" (e.g. "E.B 30 DAYS"), '
-                            'min_advance_days = days. Respect blackout dates (eb_blackout=true).'
-                        )
-                    elif c["type"] == "promo":
-                        ct_desc_parts.append(
-                            f'Promotion: promo_code="{c["promo_code"]}", '
-                            f'promo_book_till="{c["promo_till"]} 23:59:59".'
-                        )
-                    elif c["type"] == "por":
-                        ct_desc_parts.append('POR: net_price=0, promo_code="POR Rate".')
-                ct_desc = " | ".join(ct_desc_parts)
-
-                prompt_text = f"""You are an expert hotel contract data extractor. Extract ALL data from this PDF.
-
-ROOMS (use exactly these IDs and names, do not invent new ones): {json.dumps(valid_rooms)}
-CONTRACT TYPES TO EXTRACT: {ct_desc}
-PROPERTY TYPE: {prop_type}
-
-CRITICAL RULES:
-1. TRANSLATE EVERYTHING TO ENGLISH. All output must be in English, regardless of the original PDF language.
-2. Extract ONE period per distinct date range. Split periods if surcharge/blackout/min-nights rules differ.
-3. WEEKDAY/WEEKEND RATES:
-   - Set has_weekday_weekend=true
-   - rates dict = BASE (weekday) rate per room
-   - has_surcharge=true
-   - surcharge_rates = per-room weekend supplement dict e.g. {{"room_id_1": 1500, "room_id_2": 3000}}
-   - If same surcharge for all rooms use surcharge_amount (single value) instead
-   - Extract the exact weekend days stated in the PDF (e.g., "Friday & Saturday", "Saturday") into `weekend_days`. Extract the remaining weekday string into `weekday_days` (e.g., "Sun-Thu", "Sun-Fri").
-   - If there is a surcharge (weekend, gala dinner, peak season, etc.), extract the exact reason/note into `surcharge_note` (e.g. "Room rate include surcharge on Christmas Eve").
-4. HTML FORMATTING PATTERNS (STRICT):
-   Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
-   - child_policy: (Do NOT include any food/meal-related information here. Split by room using `child_policies` dict)
+            ct_desc_parts = []
+            for c in cts:
+                if c["type"] == "main":
+                    ct_desc_parts.append("Main Contract: extract all standard net rates per period.")
+                elif c["type"] == "eb":
+                    ct_desc_parts.append(
+                        'Early Bird: detect ALL tiers from PDF automatically. '
+                        'For each tier, extract days_in_advance and discount_pct. '
+                        'promo_code = "[Code from PDF] - E.B {days} DAYS" (e.g. "EBO26 - E.B 30 DAYS", or just "E.B 30 DAYS" if no code), '
+                        'min_advance_days = days. Respect blackout dates (eb_blackout=true).'
+                    )
+                elif c["type"] == "promo":
+                    ct_desc_parts.append(
+                        f'Promotion: promo_code="{c["promo_code"]}", '
+                        f'promo_book_till="{c["promo_till"]} 23:59:59".'
+                    )
+                elif c["type"] == "por":
+                    ct_desc_parts.append('POR: net_price=0, promo_code="POR Rate".')
+            ct_desc = " | ".join(ct_desc_parts)
+    
+            prompt_text = f"""You are an expert hotel contract data extractor. Extract ALL data from this PDF.
+    
+    ROOMS (use exactly these IDs and names, do not invent new ones): {json.dumps(valid_rooms)}
+    CONTRACT TYPES TO EXTRACT: {ct_desc}
+    PROPERTY TYPE: {prop_type}
+    
+    CRITICAL RULES:
+    1. TRANSLATE EVERYTHING TO ENGLISH. All output must be in English, regardless of the original PDF language.
+    2. Extract ONE period per distinct date range. Split periods if surcharge/blackout/min-nights rules differ.
+    3. WEEKDAY/WEEKEND RATES:
+       - Set has_weekday_weekend=true
+       - rates dict = BASE (weekday) rate per room
+       - has_surcharge=true
+       - surcharge_rates = per-room weekend supplement dict e.g. {{"room_id_1": 1500, "room_id_2": 3000}}
+       - If same surcharge for all rooms use surcharge_amount (single value) instead
+       - Extract the exact weekend days stated in the PDF (e.g., "Friday & Saturday", "Saturday") into `weekend_days`. Extract the remaining weekday string into `weekday_days` (e.g., "Sun-Thu", "Sun-Fri").
+       - If there is a surcharge (weekend, gala dinner, peak season, etc.), extract the exact reason/note into `surcharge_note` (e.g. "Room rate include surcharge on Christmas Eve").
+    4. HTML FORMATTING PATTERNS (STRICT):
+       Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
+       - child_policy: (Do NOT include any food/meal-related information here. Split by room using `child_policies` dict)
      <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
      <p>Child [Age] years old Sharing bed + ABF = [Price/FOC]</p>
      <p>Child/Adult Extra bed + ABF = [Price]</p>
      <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
-   - cancellation_policy: (Split by period in the periods list)
+       - cancellation_policy: (Split by period in the periods list)
      <p><strong>Cancellation: [Season/Condition]</strong></p>
      <p>• Cancellation up to [X] days prior to arrival date, No charge.</p>
      <p><strong>No Show & Early Check-Out:</strong></p>
      <p>• The equivalent of the full originally booked length of stay will be charged.</p>
      (If strictly non-refundable, use: <p><span style="color:#f44336;"><strong>NON-REFUNDABLE</strong></span></p>)
-   - meals_and_info:
+       - meals_and_info:
      <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong> (Date format strictly e.g., 1 MAY 26 - 31 JUN 26)</p>
      <p><strong>※ MEAL PLAN</strong></p>
      <p>• [Details...]</p>
@@ -652,36 +652,35 @@ CRITICAL RULES:
      <p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Details]</p>
      <p><strong>※ SUPPLEMENT CHARGE</strong> [Details]</p>
      <p><strong>※ EARLY BIRD & SPECIAL OFFERS</strong></p>
-     <p>• [Details of Early bird or special offers...]</p>
+     <p>• [Details of Early bird or special offers... Check for specific advanced booking requirements and discount percentages.]</p>
      <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
-5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
-6. cutoff_date: Extract ONLY the raw number provided in the PDF (e.g., if "14 Days", output 14). Do NOT output a date.
-7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {{"room_id_1": 2, "room_id_2": 3}}).
-8. period_promo_note: Add any period-specific conditions (e.g. MIN. 3 NIGHTS, Compulsory dinner, Not allowed to check out) to this field inside the period.
-9. net_price, extra beds, and meals: output as integers ONLY (no decimals, no commas).
-   - child_share_bed_abf, child_extra_bed_abf, extra_bed_abf, extra_bed_no_abf, full_board, half_board: Extract the prices as integer.
-10. rates dict key = room_id string EXACTLY as given in ROOMS above.
-11. PROMOTIONS: If the PDF explicitly gives promotion codes (e.g. "SUMMER26"), extract them into the `promotions` list. Calculate the discounted `rates` for each room and apply any extra bed/meal discounts if specified.
-12. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
-9. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
-10. hotel_id = "{hotel_id}", hotel_supplier = "{supplier}"
-
-Return ONLY valid JSON (no markdown fences, no explanation):
-{{
-  "hotel_id": "{hotel_id}",
-  "hotel_supplier": "{supplier}",
-  "abf": "Included",
-  "child_policy": null,
-  "child_policies": {{"room_id_here": "<p>...</p>"}},
-  "meals_and_info": "<p><strong>MAIN CONTRACT...</strong></p>",
-  "child_share_bed_abf": null,
-  "child_extra_bed_abf": null,
-  "extra_bed_abf": null,
-  "extra_bed_no_abf": null,
-  "full_board": null,
-  "half_board": null,
-  "rooms": {json.dumps(valid_rooms)},
-  "promotions": [
+    5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
+    6. cutoff_date: Extract ONLY the raw number provided in the PDF (e.g., if "14 Days", output 14). Do NOT output a date.
+    7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {{"room_id_1": 2, "room_id_2": 3}}).
+    8. period_promo_note: Keep it concise. Do not add unnecessary info. Add ONLY critical period-specific conditions (e.g. MIN. 3 NIGHTS, Compulsory dinner).
+    9. net_price, extra beds, and meals: output as integers ONLY (no decimals, no commas).
+       - child_share_bed_abf, child_extra_bed_abf, extra_bed_abf, extra_bed_no_abf, full_board, half_board: Extract the prices as integer.
+    10. rates dict key = room_id string EXACTLY as given in ROOMS above.
+    11. PROMOTIONS: If the PDF explicitly gives promotion codes (e.g. "SUMMER26"), extract them into the `promotions` list. Calculate the discounted `rates` for each room and apply any extra bed/meal discounts if specified.
+    12. CRUISE: detect night package from PDF (e.g. "1 Night", "2 Nights") and use as promo_code.
+    13. hotel_id = "{hotel_id}", hotel_supplier = "{supplier}"
+    
+    Return ONLY valid JSON (no markdown fences, no explanation):
+    {{
+      "hotel_id": "{hotel_id}",
+      "hotel_supplier": "{supplier}",
+      "abf": "Included",
+      "child_policy": null,
+      "child_policies": {{"room_id_here": "<p>...</p>"}},
+      "meals_and_info": "<p><strong>MAIN CONTRACT...</strong></p>",
+      "child_share_bed_abf": null,
+      "child_extra_bed_abf": null,
+      "extra_bed_abf": null,
+      "extra_bed_no_abf": null,
+      "full_board": null,
+      "half_board": null,
+      "rooms": {json.dumps(valid_rooms)},
+      "promotions": [
     {{
       "promo_code": "PROMO26",
       "start_date": "YYYY-MM-DD",
@@ -697,8 +696,8 @@ Return ONLY valid JSON (no markdown fences, no explanation):
       "full_board": null,
       "half_board": null
     }}
-  ],
-  "periods": [
+      ],
+      "periods": [
     {{
       "start_date": "YYYY-MM-DD",
       "end_date": "YYYY-MM-DD",
@@ -726,105 +725,105 @@ Return ONLY valid JSON (no markdown fences, no explanation):
         {{"discount_pct": 20, "promo_code": "EBO", "promo_book_till": "YYYY-MM-DD 23:59:59"}}
       ]
     }}
-  ]
-}}"""
-
-                url = (
-                    "https://generativelanguage.googleapis.com/v1beta/"
-                    f"models/gemini-2.5-flash:generateContent?key={api_key}"
-                )
-                payload = {
-                    "contents": [{
-                        "role": "user",
-                        "parts": [
-                            {"inlineData": {"mimeType": "application/pdf", "data": b64_data}},
-                            {"text": prompt_text}
-                        ]
-                    }],
-                    "generationConfig": {
-                        "temperature": 0.1,
-                        "responseMimeType": "application/json"
-                    }
+      ]
+    }}"""
+    
+            url = (
+                "https://generativelanguage.googleapis.com/v1beta/"
+                f"models/gemini-2.5-flash:generateContent?key={api_key}"
+            )
+            payload = {
+                "contents": [{
+                    "role": "user",
+                    "parts": [
+                        {"inlineData": {"mimeType": "application/pdf", "data": b64_data}},
+                        {"text": prompt_text}
+                    ]
+                }],
+                "generationConfig": {
+                    "temperature": 0.1,
+                    "responseMimeType": "application/json"
                 }
-
-                import time
-                max_retries = 3
-                for attempt in range(max_retries):
-                    resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
-                    resp_data = resp.json()
-
-                    if resp.status_code != 200:
-                        error_msg = resp_data.get("error", {}).get("message", "Gemini API Error")
-                        if "high demand" in error_msg.lower() or resp.status_code >= 500:
-                            if attempt < max_retries - 1:
-                                time.sleep(4 * (attempt + 1))  # Wait 4s, 8s
-                                continue
-                        raise Exception(error_msg)
-                    else:
-                        break
-
-                text_output = resp_data["candidates"][0]["content"]["parts"][0]["text"]
-                parsed_data = json.loads(text_output)
-
-                # ── Generate rows (43-column dashboard format) ──
-                rows = generate_rows(parsed_data, cts)
-
-                # ── Build Excel workbook ──
-                wb = Workbook()
-                ws = wb.active
-                ws.title = "Sheet1"
-
-                header_fill = PatternFill("solid", start_color="1F4E79")
-                header_font = Font(name="Arial", bold=True, color="FFFFFF", size=10)
-                data_font   = Font(name="Arial", size=10)
-
-                # Header row — ALL 43 columns, always present
+            }
+    
+            import time
+            max_retries = 3
+            for attempt in range(max_retries):
+                resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
+                resp_data = resp.json()
+    
+                if resp.status_code != 200:
+                    error_msg = resp_data.get("error", {}).get("message", "Gemini API Error")
+                    if "high demand" in error_msg.lower() or resp.status_code >= 500:
+                        if attempt < max_retries - 1:
+                            time.sleep(4 * (attempt + 1))  # Wait 4s, 8s
+                            continue
+                    raise Exception(error_msg)
+                else:
+                    break
+    
+            text_output = resp_data["candidates"][0]["content"]["parts"][0]["text"]
+            parsed_data = json.loads(text_output)
+    
+            # ── Generate rows (43-column dashboard format) ──
+            rows = generate_rows(parsed_data, cts)
+    
+            # ── Build Excel workbook ──
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Sheet1"
+    
+            header_fill = PatternFill("solid", start_color="1F4E79")
+            header_font = Font(name="Arial", bold=True, color="FFFFFF", size=10)
+            data_font   = Font(name="Arial", size=10)
+    
+            # Header row — ALL 43 columns, always present
+            for c_idx, h in enumerate(HEADERS, 1):
+                cell = ws.cell(1, c_idx, h)
+                cell.fill      = header_fill
+                cell.font      = header_font
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+                ws.column_dimensions[get_column_letter(c_idx)].width = COL_WIDTHS.get(h, 12)
+            ws.row_dimensions[1].height = 20
+    
+            date_only_cols = {"start_date", "end_date", "edited_date", "cutoff_date"}
+            datetime_cols  = {"created_date"}
+    
+            # Data rows — ALL 43 columns, None → empty cell
+            for r_idx, row in enumerate(rows, 2):
                 for c_idx, h in enumerate(HEADERS, 1):
-                    cell = ws.cell(1, c_idx, h)
-                    cell.fill      = header_fill
-                    cell.font      = header_font
-                    cell.alignment = Alignment(horizontal="center", vertical="center")
-                    ws.column_dimensions[get_column_letter(c_idx)].width = COL_WIDTHS.get(h, 12)
-                ws.row_dimensions[1].height = 20
-
-                date_only_cols = {"start_date", "end_date", "edited_date", "cutoff_date"}
-                datetime_cols  = {"created_date"}
-
-                # Data rows — ALL 43 columns, None → empty cell
-                for r_idx, row in enumerate(rows, 2):
-                    for c_idx, h in enumerate(HEADERS, 1):
-                        val  = row.get(h)
-                        cell = ws.cell(r_idx, c_idx, val)
-                        cell.font = data_font
-                        if h in date_only_cols and val:
-                            cell.number_format = "DD/MM/YYYY"
-                        elif h in datetime_cols and val:
-                            cell.number_format = "DD/MM/YYYY HH:MM:SS"
-                        if h == "net_price" and val is not None:
-                            cell.value = str(val)
-
-                buf = io.BytesIO()
-                wb.save(buf)
-                buf.seek(0)
-
-                n_periods = len(parsed_data.get("periods", []))
-                n_rooms   = len(valid_rooms)
-                st.success(
-                    f"✅ สำเร็จ! เหมียวดึงข้อมูลได้ **{len(rows)} แถว** "
-                    f"({n_periods} periods × {n_rooms} rooms · 43 columns ครบทุก field)"
-                )
-                st.balloons()
-                st.download_button(
-                    label="📥  Download Excel (.xlsx)",
-                    data=buf,
-                    file_name=f"Contract_{hotel_id}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True
-                )
-
-            except Exception as e:
-                st.error(f"❌ เกิดข้อผิดพลาด: {str(e)}")
-                import traceback
-                st.code(traceback.format_exc())
-            finally:
-                loading_overlay.empty()
+                    val  = row.get(h)
+                    cell = ws.cell(r_idx, c_idx, val)
+                    cell.font = data_font
+                    if h in date_only_cols and val:
+                        cell.number_format = "DD/MM/YYYY"
+                    elif h in datetime_cols and val:
+                        cell.number_format = "DD/MM/YYYY HH:MM:SS"
+                    if h == "net_price" and val is not None:
+                        cell.value = str(val)
+    
+            buf = io.BytesIO()
+            wb.save(buf)
+            buf.seek(0)
+    
+            n_periods = len(parsed_data.get("periods", []))
+            n_rooms   = len(valid_rooms)
+            st.success(
+                f"✅ สำเร็จ! เหมียวดึงข้อมูลได้ **{len(rows)} แถว** "
+                f"({n_periods} periods × {n_rooms} rooms · 43 columns ครบทุก field)"
+            )
+            st.balloons()
+            st.download_button(
+                label="📥  Download Excel (.xlsx)",
+                data=buf,
+                file_name=f"Contract_{hotel_id}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+    
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {str(e)}")
+            import traceback
+            st.code(traceback.format_exc())
+        finally:
+            loading_overlay.empty()
