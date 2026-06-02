@@ -611,7 +611,7 @@ CRITICAL RULES:
      <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
 5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
 6. cutoff_date: Extract ONLY the integer number of days (e.g., 14). Do not calculate actual calendar dates.
-7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {"room_id_1": 2, "room_id_2": 3}).
+7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {{"room_id_1": 2, "room_id_2": 3}}).
 8. period_promo_note: Add any period-specific conditions (e.g. MIN. 3 NIGHTS, Compulsory dinner, Not allowed to check out) to this field inside the period.
 9. net_price = integer only (no decimals, no commas).
 10. rates dict key = room_id string EXACTLY as given in ROOMS above.
