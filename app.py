@@ -751,7 +751,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
             import time
             max_retries = 3
             for attempt in range(max_retries):
-                resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
+                resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=300)
                 resp_data = resp.json()
     
                 if resp.status_code != 200:
