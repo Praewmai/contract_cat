@@ -634,8 +634,8 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
        Do NOT verbatim copy the PDF text. Summarize concisely, capture the exact meaning, and format STRICTLY using these HTML templates.
        - child_policy: (Do NOT include any food/meal-related information here. Split by room using `child_policies` dict)
      <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
-     <p>Child [Age] years old Sharing bed + ABF = [Price/FOC]</p>
-     <p>Child/Adult Extra bed + ABF = [Price]</p>
+     <p>Child [Age] years old Sharing bed + ABF = [Price/FOC] [Currency]</p>
+     <p>Child/Adult Extra bed + ABF = [Price] [Currency]</p>
      <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
        - cancellation_policy: (Split by period in the periods list)
      <p><strong>Cancellation: [Season/Condition]</strong></p>
@@ -672,6 +672,8 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
       "abf": "Included",
       "child_policy": null,
       "child_policies": {{"room_id_here": "<p>...</p>"}},
+      "cancellation_policy": "<p>...</p>",
+      "cutoff_date": 0,
       "meals_and_info": "<p><strong>MAIN CONTRACT...</strong></p>",
       "child_share_bed_abf": null,
       "child_extra_bed_abf": null,
@@ -712,7 +714,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
       "period_promo_note": null,
       "cancellation_policy": "<p>...</p>",
       "min_nights_stay": null,
-      "cutoff_date": 14,
+      "cutoff_date": 0,
       "room_allotment": {{"room_id_here": 2}},
       "has_weekday_weekend": false,
       "weekday_days": "Sun-Fri",
