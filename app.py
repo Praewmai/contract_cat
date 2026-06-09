@@ -730,10 +730,6 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
       ]
     }}"""
     
-            url = (
-                "https://generativelanguage.googleapis.com/v1beta/"
-                f"models/gemini-2.5-flash:generateContent?key={api_key}"
-            )
             payload = {
                 "contents": [{
                     "role": "user",
@@ -747,23 +743,45 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
                     "responseMimeType": "application/json"
                 }
             }
-    
+
+            models_to_try = ["gemini-2.5-flash", "gemini-2.0-flash"]
             import time
-            max_retries = 5
-            for attempt in range(max_retries):
-                resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=300)
-                resp_data = resp.json()
-    
-                if resp.status_code != 200:
-                    error_msg = resp_data.get("error", {}).get("message", "Gemini API Error")
-                    if "high demand" in error_msg.lower() or resp.status_code >= 500:
+
+            resp_data = None
+            last_error = None
+            for model_name in models_to_try:
+                url = (
+                    "https://generativelanguage.googleapis.com/v1beta/"
+                    f"models/{model_name}:generateContent?key={api_key}"
+                )
+                max_retries = 4
+                for attempt in range(max_retries):
+                    try:
+                        resp = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=300)
+                        resp_data = resp.json()
+
+                        if resp.status_code == 200:
+                            break  # success
+
+                        error_msg = resp_data.get("error", {}).get("message", "Gemini API Error")
+                        last_error = error_msg
+                        if "high demand" in error_msg.lower() or resp.status_code in (429, 500, 503):
+                            if attempt < max_retries - 1:
+                                time.sleep(8 * (2 ** attempt))  # 8s, 16s, 32s
+                                continue
+                        else:
+                            break  # non-retryable error
+                    except requests.exceptions.Timeout:
+                        last_error = "Request timed out"
                         if attempt < max_retries - 1:
-                            # Exponential backoff: 5s, 10s, 20s, 40s
-                            time.sleep(5 * (2 ** attempt))
+                            time.sleep(8 * (2 ** attempt))
                             continue
-                    raise Exception(error_msg)
-                else:
-                    break
+
+                if resp_data and resp.status_code == 200:
+                    break  # success with this model
+
+            if not resp_data or resp.status_code != 200:
+                raise Exception(f"ลองแล้วทั้ง 2 โมเดลแต่ยังไม่สำเร็จ: {last_error}\n\n💡 แนะนำ: รอ 2-3 นาทีแล้วลองกดใหม่อีกครั้งค่ะ")
     
             text_output = resp_data["candidates"][0]["content"]["parts"][0]["text"]
             parsed_data = json.loads(text_output)
