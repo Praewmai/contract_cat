@@ -749,7 +749,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
             }
     
             import time
-            max_retries = 3
+            max_retries = 5
             for attempt in range(max_retries):
                 resp      = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=300)
                 resp_data = resp.json()
@@ -758,7 +758,8 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
                     error_msg = resp_data.get("error", {}).get("message", "Gemini API Error")
                     if "high demand" in error_msg.lower() or resp.status_code >= 500:
                         if attempt < max_retries - 1:
-                            time.sleep(4 * (attempt + 1))  # Wait 4s, 8s
+                            # Exponential backoff: 5s, 10s, 20s, 40s
+                            time.sleep(5 * (2 ** attempt))
                             continue
                     raise Exception(error_msg)
                 else:
