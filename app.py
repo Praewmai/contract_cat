@@ -744,7 +744,12 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
                 }
             }
 
-            models_to_try = ["gemini-1.5-flash"]
+            models_to_try = [
+                "gemini-1.5-flash-latest", 
+                "gemini-1.5-pro-latest", 
+                "gemini-pro",
+                "gemini-2.0-flash-exp"
+            ]
             import time
 
             resp_data = None
