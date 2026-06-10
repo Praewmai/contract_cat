@@ -770,7 +770,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
                         last_error = error_msg
                         if "high demand" in error_msg.lower() or resp.status_code in (429, 500, 503):
                             if attempt < max_retries - 1:
-                                time.sleep(8 * (2 ** attempt))  # 8s, 16s, 32s
+                                time.sleep(15 * (2 ** attempt))  # 15s, 30s, 60s
                                 continue
                         else:
                             break  # non-retryable error
