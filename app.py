@@ -783,7 +783,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
                     break  # success with this model
 
             if not resp_data or resp.status_code != 200:
-                raise Exception(f"ลองแล้วทั้ง 2 โมเดลแต่ยังไม่สำเร็จ: {last_error}\n\n💡 แนะนำ: รอ 2-3 นาทีแล้วลองกดใหม่อีกครั้งค่ะ")
+                raise Exception(f"เซิร์ฟเวอร์ AI คนใช้งานหนาแน่นมาก (ลองเชื่อมต่อซ้ำแล้วแต่ยังคิวเต็ม): {last_error}\n\n💡 แนะนำ: รอ 2-3 นาทีแล้วลองกดใหม่อีกครั้งค่ะ")
     
             text_output = resp_data["candidates"][0]["content"]["parts"][0]["text"]
             parsed_data = json.loads(text_output)
