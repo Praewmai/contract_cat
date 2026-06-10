@@ -745,8 +745,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
             }
 
             models_to_try = [
-                "gemini-2.5-flash",
-                "gemini-2.5-pro"
+                "gemini-2.5-flash"
             ]
             import time
 
