@@ -158,16 +158,22 @@ OUTPUT SCHEMA (JSON):
             text_output = resp_data["candidates"][0]["content"]["parts"][0]["text"]
             parsed_data = json.loads(text_output)
 
-            st.success("✅ ดึงข้อมูลสำเร็จ! คุณสามารถกดปุ่ม Copy มุมขวาบนของแต่ละกล่องเพื่อคัดลอกโค้ดได้เลยค่ะ")
+            st.success("✅ ดึงข้อมูลสำเร็จ! คุณสามารถดูตัวอย่างการแสดงผลฝั่งซ้าย และคัดลอกโค้ดฝั่งขวาได้เลยค่ะ")
             
-            st.markdown("### 👶 Child Policy")
-            st.code(parsed_data.get("child_policy", ""), language="html")
+            def render_preview_and_code(title, html_content):
+                st.markdown(f"### {title}")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.caption("👁️ ตัวอย่างการแสดงผล (Preview)")
+                    st.markdown(f"<div style='border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background-color: #ffffff;'>{html_content}</div>", unsafe_allow_html=True)
+                with col2:
+                    st.caption("💻 โค้ด HTML (Source Code)")
+                    st.code(html_content, language="html")
+                st.markdown("<br>", unsafe_allow_html=True)
 
-            st.markdown("### ❌ Cancellation Policy")
-            st.code(parsed_data.get("cancellation_policy", ""), language="html")
-
-            st.markdown("### 🍽️ Meals & Info")
-            st.code(parsed_data.get("meals_and_info", ""), language="html")
+            render_preview_and_code("👶 Child Policy", parsed_data.get("child_policy", ""))
+            render_preview_and_code("❌ Cancellation Policy", parsed_data.get("cancellation_policy", ""))
+            render_preview_and_code("🍽️ Meals & Info", parsed_data.get("meals_and_info", ""))
 
         except Exception as e:
             loading_placeholder.markdown("""
