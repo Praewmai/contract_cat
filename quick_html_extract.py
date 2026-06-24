@@ -53,6 +53,7 @@ REQUIREMENTS:
 4. BE CONCISE. Summarize long paragraphs into short, punchy bullet points. Do not just copy-paste entire blocks of text.
 5. AGE FORMATTING: If the PDF says "child below 12 years" or "under 12", format it strictly as "0-11.99" (e.g., "Child 0-11.99 years old"). If it says "6 to 12 years", format as "6-11.99". Always use .99 for the upper bound of a child's age.
 6. CURRENCY FORMATTING: The currency abbreviation (like THB, USD, VND) MUST be placed AFTER the price value, not before (e.g., "1500 THB", "300000 VND").
+7. MONTH FORMATTING: ALL months MUST be abbreviated to 3 uppercase letters (e.g., "December" becomes "DEC", "August" becomes "AUG", "January" becomes "JAN").
 
 HTML FORMATTING PATTERNS (STRICT):
 - child_policy: (CRITICAL: You MUST extract the policy for EVERY room type. Split them using the room name as a header)
