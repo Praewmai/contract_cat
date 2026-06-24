@@ -410,6 +410,24 @@ st.markdown("""
 
 
 # ═══════════════════════════════════════════
+#  MODE SELECTION
+# ═══════════════════════════════════════════
+st.markdown("---")
+mode = st.radio(
+    "เลือกโหมดการทำงาน",
+    ["📊 แปลงเป็น Excel (เต็มรูปแบบ)", "📄 ดึงเฉพาะ HTML (รวดเร็ว)"],
+    horizontal=True,
+    label_visibility="collapsed"
+)
+st.markdown("<br>", unsafe_allow_html=True)
+
+if mode == "📄 ดึงเฉพาะ HTML (รวดเร็ว)":
+    import quick_html_extract
+    quick_html_extract.render_ui(api_key)
+    st.stop()
+
+
+# ═══════════════════════════════════════════
 #  MAIN COLUMNS
 # ═══════════════════════════════════════════
 col_left, col_right = st.columns([1.1, 1], gap="large")
