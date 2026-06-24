@@ -139,12 +139,26 @@ def _base_row(parsed, room, period, net_price, contract_type,
         'room_name':              room['room_name'],
         'hotel_transfer':         None,
         'late_check_out':         None,
-        'meals_and_info':         parsed.get('meals_and_info') or None,
+        'meals_and_info':         _format_meals_info(parsed.get('meals_and_info'), contract_type),
         'room_allotment':         allotment,
         'tags':                   '[]',
         'action':                 'insert',
         '_room_index':            room_index,
     }
+
+
+def _format_meals_info(text, contract_type):
+    """Dynamically replace MAIN CONTRACT header based on row type."""
+    if not text:
+        return None
+    
+    # We use a case-insensitive replace for robustness just in case
+    import re
+    if contract_type == 'Promotion':
+        return re.sub(r'MAIN CONTRACT', 'PROMOTION', text, flags=re.IGNORECASE)
+    elif contract_type == 'Early Bird':
+        return re.sub(r'MAIN CONTRACT', 'EARLY BIRD', text, flags=re.IGNORECASE)
+    return text
 
 
 def _surcharge_note(currency, amount, custom_note=None):
