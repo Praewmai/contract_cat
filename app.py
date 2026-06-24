@@ -644,6 +644,7 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
      <p>• The equivalent of the full originally booked length of stay will be charged.</p>
      (If strictly non-refundable, use: <p><span style="color:#f44336;"><strong>NON-REFUNDABLE</strong></span></p>)
        - meals_and_info:
+     If the document is a Main Contract:
      <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong> (Date format strictly e.g., 1 MAY 26 - 31 JUN 26)</p>
      <p><strong>※ MEAL PLAN</strong></p>
      <p>• [Details...]</p>
@@ -654,6 +655,24 @@ if st.button("🐾 สั่งเหมียวดึงข้อมูล —
      <p><strong>※ EARLY BIRD & SPECIAL OFFERS</strong></p>
      <p>• [Details of Early bird or special offers... Check for specific advanced booking requirements and discount percentages.]</p>
      <p><span style="color: #ff0000;"><strong>Remark:</strong></span> Include any food space/location info here (e.g., at Somying's kitchen Restaurant).</p>
+
+     If the document is a Promotion or Early Bird offer, use this structure exactly:
+     <p><strong>PROMOTION : [PROMOTION NAME]</strong></p>
+     <p><strong>Promo code : <span style="color: #0000ff;">[CODE]</span></strong></p>
+     <p><strong>Stay</strong> : [DATE] - [DATE]</p>
+     <p><strong>Book by</strong> : [DATE]</p>
+     <p><span style="color: #ff0000;"><strong>*Black Out : [DATES]</strong></span></p>
+     <p> </p>
+     <p><strong>⁜ Supplement charge (update [DATE])</strong></p>
+     <p>• Supplement charge of weekend <span style="color: #800080;"><strong>([DAYS])</strong></span> long weekend = [PRICE] THB per night at <strong>[ROOM TYPE]</strong></p>
+     <p> </p>
+     <p><strong>Terms and Conditions</strong></p>
+     <p>• Commission: [INFO]</p>
+     <p>• Breakfast: [INFO]</p>
+     <hr />
+     <p> <span style="color: #000000;"><strong>※ FAMILY BENEFIT</strong></span></p>
+     <p><span style="color: #000000;">Child [AGE] years old Sharing bed + ABF = [PRICE]</span><br /></p>
+     <p><span style="color: #ff0000;">*maximum one sofa bed per room</span></p>
     5. promo_book_till format: "YYYY-MM-DD 23:59:59" (ONLY if PDF explicitly states a booking deadline)
     6. cutoff_date: Extract ONLY the raw number provided in the PDF (e.g., if "14 Days", output 14). Do NOT output a date.
     7. room_allotment: Extract as a dictionary mapping room_id to integer allotment (e.g., {{"room_id_1": 2, "room_id_2": 3}}).
