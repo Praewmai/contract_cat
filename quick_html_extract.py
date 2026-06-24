@@ -50,16 +50,23 @@ REQUIREMENTS:
 1. Extract the child policy, cancellation policy, and meals/info.
 2. Format them EXACTLY according to the HTML templates below.
 3. Replace bracketed placeholders like [Age], [Price], [DATES] with actual data from the PDF.
+4. BE CONCISE. Summarize long paragraphs into short, punchy bullet points. Do not just copy-paste entire blocks of text.
 
 HTML FORMATTING PATTERNS (STRICT):
-- child_policy: (Do NOT include any food/meal-related information here)
+- child_policy: (CRITICAL: You MUST extract the policy for EVERY room type. Split them using the room name as a header)
+<p><strong>[ROOM TYPE 1]</strong></p>
 <p><span style="color: #008000;"><strong>Maximum Occupancy: [Occ]</strong></span></p>
 <p>Child [Age] years old Sharing bed + ABF = [Price/FOC] [Currency]</p>
 <p>Child/Adult Extra bed + ABF = [Price] [Currency]</p>
 <p><span style="color: #ff0000;"><strong>*Cannot add an extra bed</strong></span></p>
+<hr />
+<p><strong>[ROOM TYPE 2]</strong></p>
+... (Repeat for all rooms)
 
-- cancellation_policy: 
-<p><strong>Cancellation: [Season/Condition]</strong></p>
+- cancellation_policy: (CRITICAL: You MUST extract the cancellation rules for EVERY SEASON mentioned, e.g. Peak, High, Low)
+<p><strong>Cancellation: [Season 1 Name & Dates]</strong></p>
+<p>• Cancellation up to [X] days prior to arrival date, No charge.</p>
+<p><strong>Cancellation: [Season 2 Name & Dates]</strong></p>
 <p>• Cancellation up to [X] days prior to arrival date, No charge.</p>
 <p><strong>No Show & Early Check-Out:</strong></p>
 <p>• The equivalent of the full originally booked length of stay will be charged.</p>
@@ -68,13 +75,13 @@ HTML FORMATTING PATTERNS (STRICT):
 If the document is a Main Contract:
 <p><strong>MAIN CONTRACT [YEAR] : [DATE] - [DATE]</strong></p>
 <p><strong>※ MEAL PLAN</strong></p>
-<p>• [Details...]</p>
+<p>• [Summarized Detail 1]</p>
 <p><strong>※ MINIMUM NIGHTS & BLACKOUT DATES</strong></p>
 <p>• Minimum [X] Nights stay required on [DATES]</p>
-<p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Details]</p>
-<p><strong>※ SUPPLEMENT CHARGE</strong> [Details]</p>
+<p><span style="color: #008000;"><strong>COMPULSORY</strong></span> GALA DINNER [Summarized Detail]</p>
+<p><strong>※ SUPPLEMENT CHARGE</strong> [Summarized Detail]</p>
 <p><strong>※ EARLY BIRD & SPECIAL OFFERS</strong></p>
-<p>• [Details of Early bird...]</p>
+<p>• [Summarized Early Bird detail]</p>
 <p><span style="color: #ff0000;"><strong>Remark:</strong></span> [Food space/location info]</p>
 
 If the document is a Promotion or Early Bird offer:
@@ -88,8 +95,8 @@ If the document is a Promotion or Early Bird offer:
 <p>• Supplement charge of weekend <span style="color: #800080;"><strong>([DAYS])</strong></span> long weekend = [PRICE] THB per night at <strong>[ROOM TYPE]</strong></p>
 <p> </p>
 <p><strong>Terms and Conditions</strong></p>
-<p>• Commission: [INFO]</p>
-<p>• Breakfast: [INFO]</p>
+<p>• [Summarized concise bullet point 1]</p>
+<p>• [Summarized concise bullet point 2]</p>
 <hr />
 <p> <span style="color: #000000;"><strong>※ FAMILY BENEFIT</strong></span></p>
 <p><span style="color: #000000;">Child [AGE] years old Sharing bed + ABF = [PRICE]</span><br /></p>
